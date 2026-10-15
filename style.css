@@ -1,1718 +1,667 @@
-/* ==========================================================================
-   மெய்ப்பொருள் (Meypporul) — பாணித் தாள்கள் (Style Sheet)
-   “மேற்கோள் மட்டும் போதாது; மூலச்சான்று வேண்டும்.”
-   ========================================================================== */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+Tamil:wght@400;600;700&family=Noto+Sans+Tamil:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap');
 
-/* 1. மாறிலிகள் மற்றும் வண்ணக் கட்டமைப்பு (Design Tokens & Color Palette) */
 :root {
-  --font-tamil-sans: 'Mukta Malar', 'Noto Sans Tamil', -apple-system, BlinkMacSystemFont, 'Latha', 'Vijaya', 'Tamil Sangam MN', sans-serif;
-  --font-tamil-serif: 'Tiro Tamil', 'Noto Serif Tamil', 'InaiMathi', 'Latha', serif;
-
-  /* ஒளி பயன்முறை (Light Mode - Warm Literary Parchment) */
-  --color-bg-page: #fbf9f4;
-  --color-bg-card: #ffffff;
-  --color-bg-subtle: #f4efe6;
-  --color-bg-accent: #ede5d7;
-
-  --color-border: #e4dccf;
-  --color-border-subtle: #eee7dc;
-  --color-border-focus: #b45309;
-
-  --color-text-primary: #1c1917;
-  --color-text-secondary: #44403c;
-  --color-text-muted: #78716c;
-
-  --color-primary: #b45309;
-  --color-primary-hover: #92400e;
-  --color-primary-light: #fffbeb;
-
-  /* தீர்ப்பு வண்ணங்கள் (Verdicts) */
-  --verdict-exact-bg: #ecfdf5;
-  --verdict-exact-border: #6ee7b7;
-  --verdict-exact-text: #065f46;
-  --verdict-exact-badge: #047857;
-
-  --verdict-ortho-bg: #f0fdfa;
-  --verdict-ortho-border: #5eead4;
-  --verdict-ortho-text: #0f766e;
-  --verdict-ortho-badge: #0d9488;
-
-  --verdict-partial-bg: #fefce8;
-  --verdict-partial-border: #fde047;
-  --verdict-partial-text: #854d0e;
-  --verdict-partial-badge: #a16207;
-
-  --verdict-variation-bg: #fff7ed;
-  --verdict-variation-border: #fdba74;
-  --verdict-variation-text: #9a3412;
-  --verdict-variation-badge: #c2410c;
-
-  --verdict-notfound-bg: #fef2f2;
-  --verdict-notfound-border: #fca5a5;
-  --verdict-notfound-text: #991b1b;
-  --verdict-notfound-badge: #b91c1c;
-
-  --verdict-insufficient-bg: #f8fafc;
-  --verdict-insufficient-border: #cbd5e1;
-  --verdict-insufficient-text: #334155;
-  --verdict-insufficient-badge: #475569;
-
-  /* வாயில் வண்ணங்கள் (Gate Status) */
-  --gate-approved-bg: #ecfdf5;
-  --gate-approved-border: #10b981;
-  --gate-approved-text: #065f46;
-
-  --gate-blocked-bg: #fef2f2;
-  --gate-blocked-border: #ef4444;
-  --gate-blocked-text: #991b1b;
-
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.04);
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 14px;
+  --ink: #18221d;
+  --muted: #5e6b64;
+  --paper: #f6f3eb;
+  --card: #ffffff;
+  --card-subtle: #fbf9f4;
+  --line: #dfd8c8;
+  --line-strong: #c9bea9;
+  --green: #1c4b35;
+  --green-light: #28684a;
+  --gold: #b37322;
+  --red: #a33827;
+  --softgreen: #eaf3ec;
+  --softred: #fcedeb;
+  --softgold: #fbf1de;
+  --softpurple: #f3ecfb;
+  --purple: #6a359c;
+  --shadow: 0 10px 30px rgba(28, 38, 32, 0.06);
+  --shadow-lg: 0 16px 48px rgba(28, 38, 32, 0.1);
 }
 
-/* இருள் பயன்முறை (Dark Mode - Midnight Literary Slate) */
-[data-theme="dark"] {
-  --color-bg-page: #121417;
-  --color-bg-card: #1a1e24;
-  --color-bg-subtle: #222730;
-  --color-bg-accent: #2c333e;
-
-  --color-border: #2e3541;
-  --color-border-subtle: #242a34;
-  --color-border-focus: #f59e0b;
-
-  --color-text-primary: #f3f4f6;
-  --color-text-secondary: #d1d5db;
-  --color-text-muted: #9ca3af;
-
-  --color-primary: #f59e0b;
-  --color-primary-hover: #d97706;
-  --color-primary-light: #2c2111;
-
-  --verdict-exact-bg: #064e3b;
-  --verdict-exact-border: #059669;
-  --verdict-exact-text: #a7f3d0;
-  --verdict-exact-badge: #34d399;
-
-  --verdict-ortho-bg: #134e4a;
-  --verdict-ortho-border: #0d9488;
-  --verdict-ortho-text: #99f6e4;
-  --verdict-ortho-badge: #2dd4bf;
-
-  --verdict-partial-bg: #451a03;
-  --verdict-partial-border: #b45309;
-  --verdict-partial-text: #fef08a;
-  --verdict-partial-badge: #fde047;
-
-  --verdict-variation-bg: #431407;
-  --verdict-variation-border: #c2410c;
-  --verdict-variation-text: #fed7aa;
-  --verdict-variation-badge: #fb923c;
-
-  --verdict-notfound-bg: #450a0a;
-  --verdict-notfound-border: #b91c1c;
-  --verdict-notfound-text: #fecaca;
-  --verdict-notfound-badge: #f87171;
-
-  --verdict-insufficient-bg: #1e293b;
-  --verdict-insufficient-border: #475569;
-  --verdict-insufficient-text: #e2e8f0;
-  --verdict-insufficient-badge: #94a3b8;
-
-  --gate-approved-bg: #064e3b;
-  --gate-approved-border: #10b981;
-  --gate-approved-text: #a7f3d0;
-
-  --gate-blocked-bg: #450a0a;
-  --gate-blocked-border: #ef4444;
-  --gate-blocked-text: #fecaca;
-
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
-}
-
-/* 2. அடிப்படை அமைப்புகள் */
-*, *::before, *::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-html {
-  font-size: 16px;
-  scroll-behavior: smooth;
-}
-
+* { box-sizing: border-box; }
 body {
-  font-family: var(--font-tamil-sans);
-  background-color: var(--color-bg-page);
-  color: var(--color-text-primary);
-  line-height: 1.75;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  transition: background-color 0.25s ease, color 0.25s ease;
-  -webkit-font-smoothing: antialiased;
-}
-
-/* 3. மேல்தளப் பட்டி & தாவல்கள் */
-.site-header {
-  background-color: var(--color-bg-card);
-  border-bottom: 1px solid var(--color-border);
-  box-shadow: var(--shadow-sm);
-  position: sticky;
-  top: 0;
-  z-index: 50;
-  transition: background-color 0.25s ease, border-color 0.25s ease;
-}
-
-.header-container {
-  max-width: 1160px;
-  margin: 0 auto;
-  padding: 0.85rem 1.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-}
-
-.brand-group {
-  display: flex;
-  align-items: center;
-  gap: 0.85rem;
-  color: inherit;
-  text-decoration: none;
-  cursor: pointer;
-}
-
-.brand-group:focus-visible {
-  outline: 3px solid var(--color-primary);
-  outline-offset: 4px;
-  border-radius: var(--radius-sm);
-}
-
-.brand-emblem {
-  width: 44px;
-  height: 44px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: var(--color-bg-subtle);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  color: var(--color-primary);
-  flex-shrink: 0;
-}
-
-.brand-title {
-  font-family: var(--font-tamil-serif);
-  font-size: 1.75rem;
-  font-weight: 800;
-  color: var(--color-text-primary);
-  letter-spacing: -0.01em;
-  line-height: 1.2;
-}
-
-.brand-tagline {
-  font-size: 0.88rem;
-  color: var(--color-primary);
-  font-weight: 600;
-  line-height: 1.3;
-}
-
-.header-actions {
-  display: flex;
-  align-items: center;
-  gap: 0.85rem;
-}
-
-.corpus-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-  background-color: var(--color-bg-subtle);
-  border: 1px solid var(--color-border);
-  color: var(--color-text-secondary);
-  font-size: 0.85rem;
-  font-weight: 600;
-  padding: 0.35rem 0.75rem;
-  border-radius: 9999px;
-  white-space: nowrap;
-}
-
-.badge-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background-color: #10b981;
-  display: inline-block;
-  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
-}
-
-.btn-theme-toggle {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-  background-color: var(--color-bg-card);
-  border: 1px solid var(--color-border);
-  color: var(--color-text-secondary);
-  font-family: var(--font-tamil-sans);
-  font-size: 0.85rem;
-  font-weight: 600;
-  padding: 0.4rem 0.85rem;
-  border-radius: var(--radius-md);
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.btn-theme-toggle:hover {
-  background-color: var(--color-bg-subtle);
-  border-color: var(--color-border-focus);
-  color: var(--color-text-primary);
-}
-
-/* தாவல் பட்டி (Nav Tabs Bar) */
-.nav-tabs-bar {
-  background-color: var(--color-bg-subtle);
-  border-top: 1px solid var(--color-border-subtle);
-}
-
-.nav-tabs-container {
-  max-width: 1160px;
-  margin: 0 auto;
-  padding: 0 1.5rem;
-  display: flex;
-  gap: 0.5rem;
-  overflow-x: auto;
-}
-
-.tab-btn {
-  font-family: var(--font-tamil-sans);
-  font-size: 0.96rem;
-  font-weight: 600;
-  padding: 0.75rem 1.15rem;
-  background: transparent;
-  border: none;
-  border-bottom: 3px solid transparent;
-  color: var(--color-text-secondary);
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  white-space: nowrap;
-  transition: all 0.2s ease;
-}
-
-.tab-btn:hover {
-  color: var(--color-primary);
-  background-color: rgba(0, 0, 0, 0.02);
-}
-
-.tab-btn.active {
-  color: var(--color-primary);
-  border-bottom-color: var(--color-primary);
-  background-color: var(--color-bg-card);
-  font-weight: 700;
-}
-
-/* 4. முதன்மைப் பகுதி */
-.main-wrapper {
-  max-width: 1160px;
-  width: 100%;
-  margin: 0 auto;
-  padding: 1.75rem 1.5rem 3rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1.75rem;
-  flex: 1;
-}
-
-/* திட்ட நோக்கம் பட்டை */
-.mission-banner {
-  background: linear-gradient(135deg, var(--color-bg-card) 0%, var(--color-bg-subtle) 100%);
-  border: 1px solid var(--color-border);
-  border-left: 4px solid var(--color-primary);
-  border-radius: var(--radius-md);
-  padding: 1rem 1.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 1rem;
-  box-shadow: var(--shadow-sm);
-}
-
-.mission-text-group {
-  flex: 1;
-  min-width: 280px;
-}
-
-.mission-title {
-  color: var(--color-primary);
-  font-size: 0.95rem;
-  font-weight: 700;
-  display: block;
-  margin-bottom: 0.15rem;
-}
-
-.mission-desc {
-  font-size: 0.95rem;
-  color: var(--color-text-secondary);
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: 'Noto Sans Tamil', -apple-system, sans-serif;
   line-height: 1.6;
 }
+button, input, textarea { font: inherit; }
+button { cursor: pointer; }
 
-.disclaimer-chip {
-  background-color: var(--color-bg-card);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  padding: 0.4rem 0.8rem;
-  font-size: 0.85rem;
-  color: var(--color-text-muted);
-  font-weight: 500;
-  white-space: nowrap;
-}
-
-/* 5. உள்ளீட்டு அட்டை (Input Section) */
-.input-card, .forge-picker-card, .gate-input-card, .forge-intro-card, .gate-intro-card {
-  background-color: var(--color-bg-card);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  padding: 1.75rem 2rem;
-  box-shadow: var(--shadow-md);
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-}
-
-.input-header, .picker-header, .gate-header {
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-}
-
-.input-title, .forge-heading, .gate-heading {
-  font-family: var(--font-tamil-serif);
-  font-size: 1.4rem;
-  font-weight: 700;
-  color: var(--color-text-primary);
-}
-
-.input-hint, .forge-desc, .gate-desc {
-  font-size: 0.95rem;
-  color: var(--color-text-muted);
-}
-
-.field-label {
-  font-size: 0.95rem;
-  font-weight: 700;
-  color: var(--color-text-primary);
-  display: block;
-  margin-bottom: 0.35rem;
-}
-
-.kural-textarea, .forge-textarea, .ai-draft-textarea {
-  width: 100%;
-  font-family: var(--font-tamil-serif);
-  font-size: 1.2rem;
-  line-height: 1.8;
-  color: var(--color-text-primary);
-  background-color: var(--color-bg-page);
-  border: 2px solid var(--color-border);
-  border-radius: var(--radius-md);
-  padding: 1rem 1.25rem;
-  resize: vertical;
-  min-height: 105px;
-  outline: none;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-.kural-textarea:focus, .forge-textarea:focus, .ai-draft-textarea:focus {
-  border-color: var(--color-border-focus);
-  box-shadow: 0 0 0 3px rgba(180, 83, 9, 0.15);
-}
-
-/* விருப்பத் தெரிவுகள் (Claims Expander) */
-.claims-details {
-  background-color: var(--color-bg-page);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  padding: 0.75rem 1rem;
-}
-
-.claims-summary {
-  font-size: 0.92rem;
-  font-weight: 600;
-  color: var(--color-text-secondary);
-  cursor: pointer;
-  user-select: none;
-}
-
-.claims-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1rem;
-  margin-top: 0.85rem;
-  padding-top: 0.85rem;
-  border-top: 1px dashed var(--color-border);
-}
-
-.claim-field {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
-.claim-label {
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--color-text-muted);
-}
-
-.claim-input, .kural-num-input, .manual-input {
-  font-family: var(--font-tamil-sans);
-  font-size: 0.95rem;
-  padding: 0.5rem 0.75rem;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  background-color: var(--color-bg-card);
-  color: var(--color-text-primary);
-  outline: none;
-}
-
-.claim-input:focus, .kural-num-input:focus, .manual-input:focus {
-  border-color: var(--color-border-focus);
-}
-
-.input-controls {
+/* Topbar */
+.topbar {
+  height: 76px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 1rem;
+  padding: 0 max(calc((100vw - 1180px)/2), 24px);
+  border-bottom: 1px solid var(--line);
+  background: #ffffff;
 }
-
-.char-word-counter {
-  font-size: 0.92rem;
-  color: var(--color-text-muted);
-}
-
-.char-word-counter strong {
-  color: var(--color-text-primary);
-}
-
-.action-buttons {
+.brand {
   display: flex;
+  gap: 12px;
   align-items: center;
-  gap: 0.75rem;
-  flex-wrap: wrap;
+  text-decoration: none;
+  color: inherit;
 }
-
-.btn {
-  font-family: var(--font-tamil-sans);
-  font-size: 0.96rem;
+.brand-mark {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  background: var(--green);
+  border-radius: 10px;
+  font-family: 'Noto Serif Tamil', serif;
+  font-size: 21px;
+  font-weight: 700;
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(28, 75, 53, 0.25);
+}
+.brand strong {
+  font-family: 'Noto Serif Tamil', serif;
+  font-size: 19px;
+  line-height: 1.2;
+  display: block;
+  letter-spacing: -0.01em;
+}
+.brand small {
+  font-size: 11px;
+  color: var(--muted);
+  display: block;
+  margin-top: 2px;
+}
+.source-status {
+  font-size: 11px;
   font-weight: 600;
-  padding: 0.55rem 1.15rem;
-  border-radius: var(--radius-md);
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  transition: all 0.2s ease;
-  border: 1px solid transparent;
-}
-
-.btn-sm {
-  font-size: 0.86rem;
-  padding: 0.35rem 0.75rem;
-}
-
-.btn-primary {
-  background-color: var(--color-primary);
-  color: #ffffff;
-  border-color: var(--color-primary);
-  box-shadow: 0 2px 4px rgba(180, 83, 9, 0.25);
-}
-
-.btn-primary:hover {
-  background-color: var(--color-primary-hover);
-  border-color: var(--color-primary-hover);
-  transform: translateY(-1px);
-}
-
-.btn-secondary {
-  background-color: var(--color-bg-subtle);
-  border-color: var(--color-border);
-  color: var(--color-text-secondary);
-}
-
-.btn-secondary:hover {
-  background-color: var(--color-bg-accent);
-  color: var(--color-text-primary);
-  border-color: var(--color-border-focus);
-}
-
-/* விரைவு மாதிரி மாத்திரைகள் */
-.examples-container {
-  display: flex;
-  flex-direction: column;
-  gap: 0.65rem;
-  border-top: 1px dashed var(--color-border);
-  padding-top: 1rem;
-}
-
-.examples-label {
-  font-size: 0.92rem;
-  font-weight: 600;
-  color: var(--color-text-secondary);
-}
-
-.example-pills {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-}
-
-.pill {
-  font-family: var(--font-tamil-sans);
-  font-size: 0.88rem;
-  font-weight: 500;
-  background-color: var(--color-bg-subtle);
-  border: 1px solid var(--color-border);
-  color: var(--color-text-secondary);
-  padding: 0.35rem 0.75rem;
-  border-radius: 9999px;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.pill:hover {
-  background-color: var(--color-primary-light);
-  border-color: var(--color-primary);
-  color: var(--color-primary);
-}
-
-/* 6. முடிவுப் பகுதி (Results Section) */
-.result-section, .forge-result-area, .gate-result-area {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-/* தீர்ப்புப் பட்டை */
-.verdict-banner {
-  border-radius: var(--radius-lg);
-  padding: 1.4rem 1.75rem;
+  color: var(--green);
+  border: 1px solid #c2dbcd;
+  padding: 6px 14px;
+  border-radius: 20px;
+  background: var(--softgreen);
   display: flex;
   align-items: center;
-  gap: 1.25rem;
-  box-shadow: var(--shadow-md);
-  border: 2px solid transparent;
-  transition: all 0.25s ease;
+  gap: 6px;
 }
-
-.verdict-banner.verdict-exact {
-  background-color: var(--verdict-exact-bg);
-  border-color: var(--verdict-exact-border);
-  color: var(--verdict-exact-text);
-}
-
-.verdict-banner.verdict-ortho {
-  background-color: var(--verdict-ortho-bg);
-  border-color: var(--verdict-ortho-border);
-  color: var(--verdict-ortho-text);
-}
-
-.verdict-banner.verdict-partial {
-  background-color: var(--verdict-partial-bg);
-  border-color: var(--verdict-partial-border);
-  color: var(--verdict-partial-text);
-}
-
-.verdict-banner.verdict-variation {
-  background-color: var(--verdict-variation-bg);
-  border-color: var(--verdict-variation-border);
-  color: var(--verdict-variation-text);
-}
-
-.verdict-banner.verdict-notfound {
-  background-color: var(--verdict-notfound-bg);
-  border-color: var(--verdict-notfound-border);
-  color: var(--verdict-notfound-text);
-}
-
-.verdict-banner.verdict-insufficient {
-  background-color: var(--verdict-insufficient-bg);
-  border-color: var(--verdict-insufficient-border);
-  color: var(--verdict-insufficient-text);
-}
-
-.verdict-icon-container {
-  width: 52px;
-  height: 52px;
+.source-status::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  background: #2cb673;
   border-radius: 50%;
-  background-color: rgba(255, 255, 255, 0.9);
+  display: inline-block;
+  box-shadow: 0 0 0 2px rgba(44, 182, 115, 0.2);
+}
+
+main {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 24px 60px;
+}
+
+/* Hero */
+.hero {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 48px 0 32px;
+  gap: 32px;
+}
+.hero-badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--green);
+  background: var(--softgreen);
+  border: 1px solid #c5decb;
+  padding: 5px 12px;
+  border-radius: 20px;
+  margin-bottom: 14px;
+}
+.hero h1 {
+  font: 700 clamp(28px, 3.8vw, 46px)/1.25 'Noto Serif Tamil', serif;
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+.hero h1 em {
+  color: var(--green);
+  font-style: normal;
+}
+.hero-lede {
+  max-width: 680px;
+  color: var(--muted);
+  margin: 14px 0 0;
+  font-size: 15px;
+  line-height: 1.6;
+}
+.hero-seal {
+  width: 130px;
+  height: 130px;
+  border: 2px solid var(--line-strong);
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.75rem;
-  font-weight: 700;
-  flex-shrink: 0;
-  box-shadow: var(--shadow-sm);
-}
-
-[data-theme="dark"] .verdict-icon-container {
-  background-color: rgba(0, 0, 0, 0.4);
-}
-
-.verdict-text-group {
-  flex: 1;
-  display: flex;
+  gap: 6px;
   flex-direction: column;
-  gap: 0.15rem;
+  color: var(--green);
+  font: 700 14px 'Noto Serif Tamil', serif;
+  background: #ffffff;
+  box-shadow: var(--shadow);
+  flex-shrink: 0;
+}
+.hero-seal b {
+  font-size: 20px;
+  color: var(--gold);
 }
 
-.verdict-badge {
-  font-size: 0.85rem;
+/* Judge 1-Click Scenarios Strip */
+.judge-strip {
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--gold);
+  border-radius: 12px;
+  padding: 14px 18px;
+  margin-bottom: 28px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  box-shadow: var(--shadow);
+}
+.judge-label {
+  font-size: 13px;
   font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  opacity: 0.9;
-}
-
-.verdict-title {
-  font-family: var(--font-tamil-serif);
-  font-size: 1.65rem;
-  font-weight: 800;
-  line-height: 1.3;
-}
-
-.verdict-subtitle {
-  font-size: 0.95rem;
-  opacity: 0.95;
-}
-
-.verdict-status-tag {
-  font-size: 0.88rem;
-  font-weight: 700;
-  padding: 0.45rem 0.95rem;
-  border-radius: 9999px;
-  background-color: rgba(255, 255, 255, 0.7);
-  box-shadow: var(--shadow-sm);
+  color: var(--ink);
   white-space: nowrap;
 }
-
-[data-theme="dark"] .verdict-status-tag {
-  background-color: rgba(0, 0, 0, 0.4);
-}
-
-/* உரிமை கோரல் முரண்பாட்டு அட்டை */
-.claims-conflict-card {
-  background-color: #fff7ed;
-  border-left: 4px solid #f97316;
-  border-top: 1px solid #fed7aa;
-  border-right: 1px solid #fed7aa;
-  border-bottom: 1px solid #fed7aa;
-  border-radius: var(--radius-md);
-  padding: 1rem 1.25rem;
-}
-
-[data-theme="dark"] .claims-conflict-card {
-  background-color: #431407;
-  border-color: #9a3412;
-}
-
-.conflict-title {
-  font-size: 1rem;
-  font-weight: 700;
-  color: #c2410c;
-  margin-bottom: 0.5rem;
-}
-
-[data-theme="dark"] .conflict-title {
-  color: #fb923c;
-}
-
-.conflict-list {
-  padding-left: 1.25rem;
-  font-size: 0.95rem;
-  color: var(--color-text-primary);
-  line-height: 1.7;
-}
-
-/* முடிவு அட்டைகள் */
-.result-card {
-  background-color: var(--color-bg-card);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  padding: 1.75rem 2rem;
-  box-shadow: var(--shadow-sm);
+.judge-buttons {
   display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-}
-
-.card-heading {
-  font-family: var(--font-tamil-serif);
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: var(--color-text-primary);
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.explanation-content {
-  font-size: 1.08rem;
-  color: var(--color-text-secondary);
-  line-height: 1.85;
-}
-
-.word-change-note {
-  background-color: var(--color-bg-subtle);
-  border-left: 4px solid var(--color-primary);
-  padding: 0.85rem 1.15rem;
-  border-radius: var(--radius-sm);
-  font-size: 0.98rem;
-  color: var(--color-text-primary);
-}
-
-/* மூலக் குறள் பெட்டி */
-.candidate-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  gap: 10px;
   flex-wrap: wrap;
-  gap: 0.75rem;
 }
-
-.candidate-status-pill {
-  font-size: 0.85rem;
-  font-weight: 700;
-  padding: 0.35rem 0.85rem;
-  border-radius: 9999px;
-  background-color: var(--color-bg-subtle);
-  border: 1px solid var(--color-border);
-  color: var(--color-primary);
-}
-
-.canonical-box {
-  background-color: var(--color-bg-subtle);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  padding: 1.35rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.box-caption {
-  font-size: 0.88rem;
+.judge-btn {
+  background: var(--card-subtle);
+  border: 1px solid var(--line);
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 12px;
   font-weight: 600;
-  color: var(--color-primary);
-}
-
-.canonical-verse {
-  font-family: var(--font-tamil-serif);
-  font-size: 1.45rem;
-  font-weight: 700;
-  line-height: 1.9;
-  color: var(--color-text-primary);
-  white-space: pre-line;
-  padding-left: 1rem;
-  border-left: 3px solid var(--color-primary);
-}
-
-.canonical-meaning {
-  font-size: 1.02rem;
-  color: var(--color-text-secondary);
-  line-height: 1.7;
-  padding-top: 0.5rem;
-  border-top: 1px dashed var(--color-border);
-}
-
-/* பக்கவாட்டு சொல் ஒப்பீடு (Side-by-Side Diff) */
-.comparison-container {
+  color: var(--ink);
   display: flex;
-  flex-direction: column;
-  gap: 0.85rem;
-  border-top: 1px solid var(--color-border);
-  padding-top: 1.25rem;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.15s ease;
+}
+.judge-btn:hover {
+  background: #ffffff;
+  border-color: var(--green);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+.dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.dot-green { background: #199e59; }
+.dot-red { background: #d93829; }
+.dot-amber { background: #e69317; }
+.dot-purple { background: #883fe0; }
+
+/* Tabs */
+.tabs {
+  display: flex;
+  gap: 8px;
+  border-bottom: 2px solid var(--line);
+  margin-bottom: 28px;
+}
+.tab {
+  background: none;
+  border: 0;
+  color: var(--muted);
+  padding: 12px 18px;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.15s ease;
+}
+.tab:hover {
+  color: var(--ink);
+}
+.tab.active {
+  color: var(--green);
+  border-bottom-color: var(--green);
+  font-weight: 700;
 }
 
-.comparison-header {
+/* Views & Grids */
+.view { display: none; }
+.view.active { display: block; }
+
+.section-heading {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 0.75rem;
+  margin-bottom: 18px;
 }
-
-.comparison-title {
-  font-family: var(--font-tamil-serif);
-  font-size: 1.15rem;
+.section-heading h2 {
+  font: 700 22px 'Noto Serif Tamil', serif;
+  margin: 0;
+}
+.step-badge {
+  font-size: 11px;
   font-weight: 700;
-  color: var(--color-text-primary);
+  color: var(--green);
+  border: 1px solid #c2dbcd;
+  background: var(--softgreen);
+  padding: 5px 12px;
+  border-radius: 20px;
 }
 
-.diff-legend {
+.work-grid {
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  gap: 22px;
+}
+.panel {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+}
+.input-panel { padding: 24px; }
+.input-header {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  font-size: 0.85rem;
-  color: var(--color-text-muted);
+  justify-content: space-between;
+  margin-bottom: 8px;
 }
-
-.legend-item {
-  display: inline-flex;
+.sample-pills {
+  display: flex;
   align-items: center;
-  gap: 0.35rem;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--muted);
+}
+.pill-btn {
+  background: var(--softgreen);
+  border: 1px solid #c3ddcc;
+  color: var(--green);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 6px;
+}
+.pill-btn:hover {
+  background: var(--green);
+  color: #fff;
+}
+.pill-btn-danger {
+  background: var(--softred);
+  border-color: #f5c8c2;
+  color: var(--red);
+}
+.pill-btn-danger:hover {
+  background: var(--red);
+  color: #fff;
 }
 
-.legend-chip {
-  width: 12px;
-  height: 12px;
-  border-radius: 3px;
-  display: inline-block;
+.input-panel label, .forge-controls label {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+.input-panel textarea, .input-panel input, .forge-controls input {
+  width: 100%;
+  border: 1px solid #d5cebf;
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 12px 14px;
+  color: var(--ink);
+  outline: none;
+  transition: all 0.15s ease;
+}
+.input-panel textarea {
+  resize: vertical;
+  min-height: 110px;
+  font-size: 14px;
+  line-height: 1.7;
+}
+.input-panel textarea:focus, .input-panel input:focus, .forge-controls input:focus {
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px rgba(28, 75, 53, 0.12);
+}
+.manual-quote-box {
+  margin-top: 14px;
+}
+.manual-quote-box input {
+  height: 42px;
+  font-size: 13px;
 }
 
-.legend-chip.match { background-color: #10b981; }
-.legend-chip.diff { background-color: #ef4444; }
-.legend-chip.extra { background-color: #f59e0b; }
-
-.comparison-grid {
+.field-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1.25rem;
+  gap: 12px;
+  margin: 14px 0;
 }
-
-@media (max-width: 768px) {
-  .comparison-grid {
-    grid-template-columns: 1fr;
-  }
+.field-row label { font-size: 12px; }
+.field-row input { height: 42px; }
+.number-row {
+  grid-template-columns: 1fr auto;
+  align-items: end;
 }
+.number-row .secondary-button { height: 42px; }
 
-.comparison-col {
-  background-color: var(--color-bg-page);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  padding: 1.25rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.85rem;
-}
+.muted { color: var(--muted); font-size: 11px; font-weight: 400; }
 
-.col-header {
-  font-size: 0.88rem;
+.primary-button, .secondary-button {
+  border: 0;
+  border-radius: 8px;
+  background: var(--green);
+  color: #fff;
+  padding: 12px 18px;
   font-weight: 700;
-  color: var(--color-text-secondary);
-  border-bottom: 1px dashed var(--color-border);
-  padding-bottom: 0.5rem;
+  font-size: 13px;
+  transition: all 0.15s ease;
 }
-
-.tokens-flow {
+.primary-button {
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  min-height: 80px;
-  align-items: flex-start;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+.primary-button:hover, .secondary-button:hover {
+  background: var(--green-light);
+  transform: translateY(-1px);
+}
+.text-button {
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  font-weight: 600;
+  font-size: 13px;
+  padding: 8px 12px;
+  border-radius: 6px;
+}
+.text-button:hover {
+  color: var(--ink);
+  background: rgba(0,0,0,0.04);
+}
+.button-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 14px;
 }
 
-/* சொல் சிப்புகள் */
-.token-chip {
-  font-family: var(--font-tamil-serif);
-  font-size: 1.15rem;
-  padding: 0.35rem 0.65rem;
-  border-radius: var(--radius-sm);
+/* Results */
+.result-panel {
+  min-height: 380px;
+  padding: 24px;
+  background: #ffffff;
+}
+.empty-state {
+  height: 100%;
+  min-height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  text-align: center;
+  color: var(--muted);
+}
+.empty-icon {
+  width: 52px;
+  height: 52px;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 22px;
+  margin-bottom: 12px;
+  background: var(--card-subtle);
+}
+.empty-state h3 {
+  font: 700 17px 'Noto Serif Tamil', serif;
+  color: var(--ink);
+  margin: 0 0 6px;
+}
+.empty-state p {
+  font-size: 13px;
+  max-width: 320px;
+  margin: 0;
+}
+
+/* Forge Controls */
+.forge-controls {
+  display: flex;
+  align-items: end;
+  gap: 12px;
+  padding: 18px;
+  margin-bottom: 20px;
+}
+.forge-controls label { margin: 0 0 6px; }
+.forge-controls input { width: 110px; height: 42px; }
+.forge-controls .secondary-button { height: 42px; }
+
+/* Result Details */
+.result-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--line);
+}
+.verdict {
   display: inline-flex;
   align-items: center;
-  gap: 0.3rem;
-  line-height: 1.5;
-}
-
-.token-chip.token-match {
-  background-color: rgba(16, 185, 129, 0.15);
-  border: 1px solid rgba(16, 185, 129, 0.4);
-  color: #065f46;
-}
-
-[data-theme="dark"] .token-chip.token-match {
-  background-color: rgba(16, 185, 129, 0.25);
-  border-color: rgba(16, 185, 129, 0.5);
-  color: #6ee7b7;
-}
-
-.token-chip.token-altered {
-  background-color: rgba(245, 158, 11, 0.18);
-  border: 1px solid rgba(245, 158, 11, 0.5);
-  color: #9a3412;
-  font-weight: 600;
-}
-
-[data-theme="dark"] .token-chip.token-altered {
-  background-color: rgba(245, 158, 11, 0.25);
-  border-color: rgba(245, 158, 11, 0.6);
-  color: #fde047;
-}
-
-.token-chip.token-missing {
-  background-color: rgba(239, 68, 68, 0.15);
-  border: 1px solid rgba(239, 68, 68, 0.4);
-  color: #991b1b;
-  text-decoration: underline wavy;
-}
-
-[data-theme="dark"] .token-chip.token-missing {
-  background-color: rgba(239, 68, 68, 0.25);
-  border-color: rgba(239, 68, 68, 0.5);
-  color: #fca5a5;
-}
-
-.token-tag {
-  font-size: 0.72rem;
-  font-family: var(--font-tamil-sans);
-  background-color: rgba(0, 0, 0, 0.08);
-  padding: 0.1rem 0.3rem;
-  border-radius: 3px;
-  font-weight: 600;
-}
-
-[data-theme="dark"] .token-tag {
-  background-color: rgba(255, 255, 255, 0.15);
-}
-
-/* அளவீடுகள் கட்டமைப்பு */
-.metrics-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-  gap: 0.85rem;
-  border-top: 1px solid var(--color-border);
-  padding-top: 1.25rem;
-}
-
-.metric-card {
-  background-color: var(--color-bg-page);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  padding: 0.85rem;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
-}
-
-.metric-num {
-  font-size: 1.5rem;
-  font-weight: 800;
-  color: var(--color-primary);
-}
-
-.metric-title {
-  font-size: 0.82rem;
-  color: var(--color-text-muted);
-  font-weight: 600;
-}
-
-/* அதிகாரப்பூர்வ ஆதாரப் பதிவு (Evidence Record) */
-.evidence-record-container {
-  background-color: var(--color-bg-page);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  padding: 1.25rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.85rem;
-  border-top: 2px solid var(--color-primary);
-}
-
-.evidence-record-heading {
-  font-family: var(--font-tamil-serif);
-  font-size: 1.1rem;
+  gap: 6px;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 12px;
   font-weight: 700;
-  color: var(--color-text-primary);
+  letter-spacing: 0.02em;
 }
-
-.evidence-table {
-  display: flex;
-  flex-direction: column;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  background-color: var(--color-bg-card);
-  overflow: hidden;
+.verdict.good { background: var(--softgreen); color: var(--green); border: 1px solid #bddbc9; }
+.verdict.warn { background: var(--softgold); color: #875411; border: 1px solid #edd5a8; }
+.verdict.bad { background: var(--softred); color: var(--red); border: 1px solid #f2bdb5; }
+.result-head h3 {
+  font: 700 19px 'Noto Serif Tamil', serif;
+  margin: 10px 0 0;
 }
-
-.ev-row {
+.result-section {
+  padding: 16px 0;
+  border-bottom: 1px solid #f0ebe0;
+}
+.result-section:last-child { border: 0; padding-bottom: 0; }
+.result-section h4 {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  margin: 0 0 8px;
+}
+.verse-text {
+  font: 600 17px/2 'Noto Serif Tamil', serif;
+  white-space: pre-line;
+  color: var(--ink);
+  background: var(--card-subtle);
+  padding: 14px 18px;
+  border-radius: 8px;
+  border-left: 3px solid var(--green);
+}
+.meaning-text {
+  font: 400 14px/1.8 'Noto Serif Tamil', serif;
+  color: var(--ink);
+  margin: 0;
+  background: var(--card-subtle);
+  padding: 12px 16px;
+  border-left: 3px solid var(--gold);
+  border-radius: 6px;
+}
+.explanation {
+  font-size: 13px;
+  margin: 0;
+  color: var(--ink);
+  line-height: 1.6;
+}
+.meta-grid {
   display: grid;
-  grid-template-columns: 220px 1fr;
-  border-bottom: 1px solid var(--color-border);
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+.meta-cell {
+  background: var(--card-subtle);
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+}
+.meta-cell small { font-size: 10px; color: var(--muted); display: block; }
+.meta-cell strong { font-size: 12px; display: block; margin-top: 2px; }
+
+/* Diff Styling */
+.diff-line {
+  font: 500 15px/2.2 'Noto Serif Tamil', serif;
+  margin: 6px 0;
+}
+.diff-same { color: var(--green); }
+.diff-change {
+  color: #8c5208;
+  background: #fde8b8;
+  border-radius: 4px;
+  padding: 2px 5px;
+  font-weight: 700;
+}
+.diff-missing {
+  color: var(--red);
+  text-decoration: line-through;
+  background: #fcedeb;
+  border-radius: 4px;
+  padding: 2px 5px;
 }
 
-.ev-row:last-child {
-  border-bottom: none;
+/* Multi-Witness Details */
+.witness-report {
+  margin-top: 14px;
+  display: grid;
+  gap: 12px;
 }
-
-@media (max-width: 680px) {
-  .ev-row {
-    grid-template-columns: 1fr;
-  }
+.witness-edition {
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--card-subtle);
 }
-
-.ev-cell {
-  padding: 0.65rem 0.95rem;
-  font-size: 0.92rem;
+.witness-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
-
-.ev-label {
-  background-color: var(--color-bg-subtle);
-  font-weight: 600;
-  color: var(--color-text-secondary);
-  border-right: 1px solid var(--color-border);
+.witness-title strong { font-size: 13px; }
+.witness-reading {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--line);
 }
-
-.ev-val {
-  color: var(--color-text-primary);
-}
-
-.ev-link {
-  color: var(--color-primary);
-  text-decoration: underline;
+.source-hash {
+  display: block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--muted);
+  margin-top: 8px;
   word-break: break-all;
 }
 
-.hash-code {
-  font-family: monospace;
-  font-size: 0.85rem;
-  background-color: var(--color-bg-subtle);
-  padding: 0.15rem 0.4rem;
-  border-radius: 3px;
-  display: inline-block;
+/* Gate Item Cards */
+.gate-item {
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  margin-top: 12px;
+  background: var(--card-subtle);
+}
+.gate-item strong { font-size: 13px; }
+.gate-item p {
+  font: 15px/1.8 'Noto Serif Tamil', serif;
+  margin: 8px 0;
 }
 
-.hash-note {
-  font-size: 0.8rem;
-  color: var(--color-text-muted);
-  display: block;
-  margin-top: 0.2rem;
+/* API Panel */
+.api-panel {
+  padding: 30px;
 }
-
-/* யாப்பு குறிப்பு (Poetic Form Analysis) */
-.poetic-note-details {
-  background-color: var(--color-bg-page);
-  border: 1px dashed var(--color-border);
-  border-radius: var(--radius-md);
-  padding: 0.75rem 1rem;
+.api-lead {
+  font-size: 15px;
+  color: var(--ink);
+  margin: 0 0 20px;
 }
-
-.poetic-note-summary {
-  font-size: 0.92rem;
-  font-weight: 600;
-  color: var(--color-text-secondary);
-  cursor: pointer;
-  user-select: none;
+.code-block {
+  background: #151c19;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 20px;
 }
-
-.poetic-note-body {
-  margin-top: 0.85rem;
-  padding-top: 0.85rem;
-  border-top: 1px solid var(--color-border);
-  display: flex;
-  flex-direction: column;
-  gap: 0.65rem;
+.code-title {
+  background: #202b26;
+  color: #a4b5ad;
+  padding: 8px 16px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  border-bottom: 1px solid #2d3d36;
 }
-
-.poetic-disclaimer {
-  font-size: 0.88rem;
-  color: var(--color-text-muted);
-  background-color: var(--color-bg-subtle);
-  padding: 0.65rem 0.85rem;
-  border-radius: var(--radius-sm);
+.code-block pre {
+  margin: 0;
+  padding: 16px;
+  overflow-x: auto;
+}
+.code-block code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  color: #e5f2eb;
   line-height: 1.6;
 }
 
-.poetic-metrics {
-  font-size: 0.95rem;
-  color: var(--color-text-primary);
-  line-height: 1.7;
-}
-
-/* 7. குறள் மாற்றிப் பார்ப்பு (Forgery Forge Area) */
-.forge-demo-controls {
+/* Footer */
+footer {
+  margin-top: 60px;
+  padding: 24px 0;
   display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  padding-top: 0.75rem;
-  border-top: 1px dashed var(--color-border);
-}
-
-.demo-title {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--color-text-secondary);
-}
-
-.demo-btn-group {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-}
-
-.picker-input-group {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-top: 0.35rem;
-}
-
-.kural-num-input {
-  width: 90px;
-}
-
-.forge-editor-footer {
-  display: flex;
-  align-items: center;
   justify-content: space-between;
-  margin-top: 0.5rem;
-  font-size: 0.9rem;
-  color: var(--color-text-muted);
-}
-
-.warning-callout {
-  background-color: #fff7ed;
-  border-left: 4px solid #ea580c;
-  padding: 0.85rem 1.15rem;
-  border-radius: var(--radius-sm);
-  font-size: 0.95rem;
-  color: #9a3412;
-  margin-top: 0.5rem;
-}
-
-[data-theme="dark"] .warning-callout {
-  background-color: #431407;
-  color: #fdba74;
-}
-
-/* 8. AI பதில் சான்றாய்வு (AI Truth Gate Area) */
-.gate-notice-chip {
-  background-color: var(--color-bg-subtle);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  padding: 0.5rem 0.85rem;
-  font-size: 0.88rem;
-  color: var(--color-text-muted);
-}
-
-.gate-presets {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  align-items: center;
-  margin-top: 0.35rem;
-}
-
-.presets-title {
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--color-text-muted);
-}
-
-.gate-mode-selector {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-  flex-wrap: wrap;
-  padding: 0.75rem 1rem;
-  background-color: var(--color-bg-page);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  margin-top: 0.5rem;
-}
-
-.mode-title {
-  font-size: 0.9rem;
-  font-weight: 700;
-  color: var(--color-text-primary);
-}
-
-.mode-radio-label {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  font-size: 0.92rem;
-  color: var(--color-text-secondary);
-  cursor: pointer;
-}
-
-.manual-span-box {
-  background-color: var(--color-bg-page);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  padding: 1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-}
-
-.gate-action-row {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  margin-top: 0.5rem;
-}
-
-/* வாயில் நிலை பட்டை */
-.gate-status-banner {
-  border-radius: var(--radius-lg);
-  padding: 1.5rem 1.75rem;
-  display: flex;
-  align-items: center;
-  gap: 1.25rem;
-  box-shadow: var(--shadow-md);
-  border: 2px solid transparent;
-}
-
-.gate-status-banner.status-approved {
-  background-color: var(--gate-approved-bg);
-  border-color: var(--gate-approved-border);
-  color: var(--gate-approved-text);
-}
-
-.gate-status-banner.status-blocked {
-  background-color: var(--gate-blocked-bg);
-  border-color: var(--gate-blocked-border);
-  color: var(--gate-blocked-text);
-}
-
-.gate-status-icon {
-  font-size: 2.25rem;
-}
-
-.gate-status-title {
-  font-family: var(--font-tamil-serif);
-  font-size: 1.65rem;
-  font-weight: 800;
-  line-height: 1.3;
-}
-
-.gate-status-summary {
-  font-size: 1rem;
-  margin-top: 0.25rem;
-}
-
-/* மேற்கோள் அட்டை பட்டியல் */
-.spans-list-container {
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-}
-
-.span-card {
-  background-color: var(--color-bg-page);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  padding: 1.25rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.85rem;
-  border-left: 4px solid var(--color-primary);
-}
-
-.span-card.span-verified {
-  border-left-color: #10b981;
-}
-
-.span-card.span-blocked {
-  border-left-color: #ef4444;
-}
-
-.span-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-}
-
-.span-title {
-  font-size: 0.95rem;
-  font-weight: 700;
-  color: var(--color-text-primary);
-}
-
-.span-badge {
-  font-size: 0.82rem;
-  font-weight: 700;
-  padding: 0.25rem 0.65rem;
-  border-radius: 9999px;
-}
-
-.span-badge.verified {
-  background-color: rgba(16, 185, 129, 0.2);
-  color: #065f46;
-}
-
-.span-badge.blocked {
-  background-color: rgba(239, 68, 68, 0.2);
-  color: #991b1b;
-}
-
-[data-theme="dark"] .span-badge.verified { color: #6ee7b7; }
-[data-theme="dark"] .span-badge.blocked { color: #fca5a5; }
-
-.span-text-box {
-  background-color: var(--color-bg-card);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  padding: 0.85rem;
-  font-family: var(--font-tamil-serif);
-  font-size: 1.15rem;
-  line-height: 1.8;
-  color: var(--color-text-primary);
-}
-
-.span-verdict-row {
-  display: flex;
-  align-items: baseline;
-  gap: 0.5rem;
-  font-size: 0.95rem;
-}
-
-.span-verdict-val {
-  font-weight: 700;
-  color: var(--color-primary);
-}
-
-.span-explanation {
-  font-size: 0.92rem;
-  color: var(--color-text-secondary);
-  line-height: 1.7;
-}
-
-.btn-replace-quote {
-  align-self: flex-start;
-  font-family: var(--font-tamil-sans);
-  font-size: 0.88rem;
-  font-weight: 600;
-  padding: 0.4rem 0.85rem;
-  background-color: var(--color-primary-light);
-  border: 1px solid var(--color-primary);
-  color: var(--color-primary);
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.btn-replace-quote:hover {
-  background-color: var(--color-primary);
-  color: #ffffff;
-}
-
-/* 9. மென்பொருள் நெறிமுறை & வெளிப்படைத்தன்மை */
-.methodology-section, .data-integrity-card {
-  background-color: var(--color-bg-card);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  padding: 2rem;
-  box-shadow: var(--shadow-sm);
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-.section-heading-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-}
-
-.section-title {
-  font-family: var(--font-tamil-serif);
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--color-text-primary);
-}
-
-.section-subtitle {
-  font-size: 1rem;
-  color: var(--color-text-muted);
-}
-
-.methodology-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1.25rem;
-}
-
-.method-card {
-  background-color: var(--color-bg-page);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  padding: 1.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.method-icon {
-  font-size: 2rem;
-  width: 48px;
-  height: 48px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: var(--color-bg-subtle);
-  border-radius: var(--radius-sm);
-}
-
-.method-heading {
-  font-family: var(--font-tamil-serif);
-  font-size: 1.15rem;
-  font-weight: 700;
-  color: var(--color-text-primary);
-}
-
-.method-text {
-  font-size: 0.96rem;
-  color: var(--color-text-secondary);
-  line-height: 1.7;
-}
-
-.data-integrity-card {
-  background: linear-gradient(135deg, var(--color-bg-subtle) 0%, var(--color-bg-card) 100%);
-}
-
-.integrity-content {
-  display: flex;
-  flex-direction: column;
-  gap: 0.85rem;
-}
-
-.integrity-title {
-  font-family: var(--font-tamil-serif);
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: var(--color-text-primary);
-}
-
-.integrity-desc {
-  font-size: 1.02rem;
-  color: var(--color-text-secondary);
-  line-height: 1.8;
-}
-
-.integrity-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.65rem;
-  margin-top: 0.5rem;
-}
-
-.int-tag {
-  background-color: var(--color-bg-card);
-  border: 1px solid var(--color-border);
-  color: var(--color-text-secondary);
-  font-size: 0.85rem;
-  font-weight: 600;
-  padding: 0.35rem 0.75rem;
-  border-radius: var(--radius-sm);
-}
-
-/* 10. அடிக்குறிப்பு */
-.site-footer {
-  background-color: var(--color-bg-card);
-  border-top: 1px solid var(--color-border);
-  padding: 2rem 1.5rem;
-  margin-top: auto;
-}
-
-.footer-container {
-  max-width: 1160px;
-  margin: 0 auto;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.footer-brand {
-  font-size: 1.05rem;
-  color: var(--color-text-primary);
-}
-
-.footer-note {
-  font-size: 0.92rem;
-  color: var(--color-text-muted);
-}
-
-.footer-disclaimer {
-  font-size: 0.88rem;
-  color: var(--color-text-muted);
-  font-weight: 500;
-  margin-top: 0.25rem;
-}
-
-.result-footer-note {
-  background-color: var(--color-bg-subtle);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  padding: 0.85rem 1.25rem;
-  font-size: 0.95rem;
-  color: var(--color-text-secondary);
-  text-align: center;
-}
-
-/* 12. நடுவர் பார்வைக்கான நேரடி செயல்விளக்க வழிகாட்டி (Judge Demo Guide) */
-.judge-guide-details {
-  background: linear-gradient(135deg, var(--color-bg-card) 0%, var(--color-bg-subtle) 100%);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  padding: 1rem 1.25rem;
-  box-shadow: var(--shadow-sm);
-}
-
-.judge-guide-summary {
-  font-family: var(--font-tamil-serif);
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: var(--color-primary);
-  cursor: pointer;
-  user-select: none;
-}
-
-.judge-guide-body {
-  margin-top: 0.85rem;
-  padding-top: 0.85rem;
-  border-top: 1px dashed var(--color-border);
-  display: flex;
-  flex-direction: column;
-  gap: 0.85rem;
-}
-
-.judge-guide-desc {
-  font-size: 0.94rem;
-  color: var(--color-text-secondary);
-}
-
-.judge-steps-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 0.65rem;
-}
-
-.judge-step-btn {
-  font-family: var(--font-tamil-sans);
-  background-color: var(--color-bg-page);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  padding: 0.65rem 0.85rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  text-align: left;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.judge-step-btn:hover {
-  background-color: var(--color-primary-light);
-  border-color: var(--color-primary);
-  transform: translateY(-1px);
-}
-
-.judge-step-btn .step-num {
-  font-size: 0.78rem;
-  font-weight: 800;
-  color: var(--color-primary);
-  text-transform: uppercase;
-}
-
-.judge-step-btn .step-text {
-  font-size: 0.88rem;
-  font-weight: 600;
-  color: var(--color-text-primary);
-  line-height: 1.4;
-}
-
-/* குறள் மாற்றிப் பார்ப்பு — மூலக் குறள் விவரப் பெட்டி */
-.forge-canonical-info {
-  background-color: var(--color-bg-subtle);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  padding: 0.85rem 1.15rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-  margin-bottom: 0.85rem;
-}
-
-.forge-canonical-info .info-badge {
-  font-size: 0.82rem;
-  font-weight: 700;
-  color: var(--color-primary);
-}
-
-.forge-canonical-info .kural-meta-text {
-  font-size: 0.95rem;
-  font-weight: 700;
-  color: var(--color-text-primary);
-}
-
-.forge-canonical-info .forge-canonical-text {
-  font-family: var(--font-tamil-serif);
-  font-size: 1.15rem;
-  font-weight: 600;
-  line-height: 1.7;
-  color: var(--color-text-secondary);
-  border-left: 3px solid var(--color-primary);
-  padding-left: 0.75rem;
-  white-space: pre-line;
-}
-
-/* AI வரைவு மாற்றீடு செய்யப்பட்ட அறிவிப்பு பலகை */
-.ai-replace-notice {
-  background-color: #ecfdf5;
-  border: 1px solid #10b981;
-  color: #065f46;
-  border-radius: var(--radius-md);
-  padding: 0.85rem 1.15rem;
-  font-size: 0.95rem;
-  line-height: 1.6;
-}
-
-[data-theme="dark"] .ai-replace-notice {
-  background-color: #064e3b;
-  border-color: #34d399;
-  color: #a7f3d0;
-}
-
-/* 13. மொபைல் மற்றும் சிறிய திரை இணக்கம் */
-@media (max-width: 680px) {
-  .header-container {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-  .header-actions {
-    width: 100%;
-    justify-content: space-between;
-  }
-  .input-card, .result-card, .methodology-section, .data-integrity-card, .forge-picker-card, .gate-input-card {
-    padding: 1.25rem;
-  }
-  .verdict-banner, .gate-status-banner {
-    flex-direction: column;
-    text-align: center;
-  }
-  .action-buttons {
-    width: 100%;
-  }
-  .btn {
-    flex: 1;
-    justify-content: center;
-  }
-  .judge-steps-grid {
-    grid-template-columns: 1fr;
-  }
+  color: var(--muted);
+  font-size: 12px;
+  border-top: 1px solid var(--line);
+}
+.conflict {
+  color: var(--red);
+  background: var(--softred);
+  border: 1px solid #f7c3bc;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 12px;
+  margin-top: 10px;
+}
+
+@media (max-width: 860px) {
+  .work-grid { grid-template-columns: 1fr; }
+  .hero { flex-direction: column; align-items: flex-start; }
+  .hero-seal { display: none; }
+  .meta-grid { grid-template-columns: 1fr 1fr; }
+  .tabs { overflow-x: auto; }
+  .tab { white-space: nowrap; }
 }

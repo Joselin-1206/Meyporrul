@@ -1,492 +1,219 @@
-<!DOCTYPE html>
-<html lang="ta" data-theme="light">
+<!doctype html>
+<html lang="ta">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>மெய்ப்பொருள் — மேற்கோள் மட்டும் போதாது; மூலச்சான்று வேண்டும்.</title>
-  <meta name="description" content="திருக்குறள் மேற்கோள்களின் உண்மைத்தன்மையை 1330 மூலப் பாடங்களோடு ஒப்பிட்டு சரிபார்த்து, போலி மேற்கோள்கள் மற்றும் சொல் மாற்றங்களைத் தடுக்கும் ஆய்வுத்தளம்.">
-
-  <!-- கூகுள் தமிழ் எழுத்துருக்கள் (Google Fonts) -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#1a382b">
+  <title>மெய்ப்பொருள் — AI மேற்கோள் தடுப்பு வாயில் & மூலச்சான்று இயந்திரம்</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Mukta+Malar:wght@400;500;600;700;800&family=Tiro+Tamil:ital@0;1&display=swap" rel="stylesheet">
-
-  <link rel="stylesheet" href="style.css?v=home-brand-v2">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Tamil:wght@400;600;700&family=Noto+Sans+Tamil:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- முதன்மை மேல்தளப் பட்டி (Header) -->
-  <header class="site-header" role="banner">
-    <div class="header-container">
-      <a class="brand-group" id="homeBrand" href="#labTab" aria-label="மெய்ப்பொருள் முகப்பு">
-        <div class="brand-emblem" aria-hidden="true">
-          <!-- ஏட்டுச்சுவடி / தூவல் சின்னம் -->
-          <svg viewBox="0 0 40 40" width="36" height="36" fill="currentColor">
-            <path d="M6 8C6 6.9 6.9 6 8 6H32C33.1 6 34 6.9 34 8V32C34 33.1 33.1 34 32 34H8C6.9 34 6 33.1 6 32V8ZM9 9V31H31V9H9Z" fill-opacity="0.2"/>
-            <path d="M12 13H28V15H12V13ZM12 18H28V20H12V18ZM12 23H23V25H12V23Z"/>
-            <circle cx="28" cy="24" r="3" fill="var(--color-primary)"/>
-          </svg>
-        </div>
-        <div>
-          <h1 class="brand-title">மெய்ப்பொருள்</h1>
-          <p class="brand-tagline">“மேற்கோள் மட்டும் போதாது; மூலச்சான்று வேண்டும்.”</p>
-        </div>
-      </a>
-
-      <div class="header-actions">
-        <span class="corpus-badge" id="corpusBadge" title="1330 திறந்தநிலை மூலக் குறள்கள்">
-          <span class="badge-dot"></span> 1330 மூலக் குறள்கள்
-        </span>
-        <button id="themeToggleBtn" class="btn-theme-toggle" type="button" aria-label="பயன்முறை மாற்றம்">
-          <span id="themeIcon" aria-hidden="true">🌙</span>
-          <span id="themeLabel">இருள் பயன்முறை</span>
-        </button>
-      </div>
+  <header class="topbar">
+    <a class="brand" href="#முகப்பு" aria-label="மெய்ப்பொருள் முகப்பு">
+      <span class="brand-mark" aria-hidden="true">மெ</span>
+      <span>
+        <strong>மெய்ப்பொருள்</strong>
+        <small>AI உரைத் தடுப்பு வாயில் · பல பதிப்பு மூலச்சான்று</small>
+      </span>
+    </a>
+    <div class="topbar-right">
+      <div class="source-status" id="sourceStatus" role="status">1330 குறள்கள் · SQLite தயார்</div>
     </div>
-
-    <!-- மூன்று முக்கியப் பிரிவுகளுக்கான தாவல் பட்டி (Nav Tabs) -->
-    <nav class="nav-tabs-bar" aria-label="முதன்மை வழிகாட்டல்">
-      <div class="nav-tabs-container">
-        <button type="button" class="tab-btn active" data-tab="labTab" id="tabBtnLab">
-          <span class="tab-icon">🔬</span> 1. மேற்கோள் ஆய்வகம்
-        </button>
-        <button type="button" class="tab-btn" data-tab="forgeTab" id="tabBtnForge">
-          <span class="tab-icon">✍️</span> 2. குறள் மாற்றிப் பார்ப்பு
-        </button>
-        <button type="button" class="tab-btn" data-tab="aiGateTab" id="tabBtnAiGate">
-          <span class="tab-icon">🛡️</span> 3. AI பதில் சான்றாய்வு
-        </button>
-      </div>
-    </nav>
   </header>
 
-  <!-- முதன்மை உள்ளடக்கம் (Main Content) -->
-  <main class="main-wrapper" id="mainContent">
-
-    <!-- அறிமுகக் குறிப்பு (Mission Banner) -->
-    <section class="mission-banner" aria-label="திட்ட நோக்கம்">
-      <div class="mission-text-group">
-        <strong class="mission-title">திட்டம்</strong>
-        <p class="mission-desc">
-          திருக்குறள் மேற்கோள்களை மூலத் தரவுடன் ஒப்பிட்டு, மாற்றங்களையும் ஆதாரமின்மையையும் காட்டுகிறது.
-        </p>
+  <main id="முகப்பு">
+    <section class="hero">
+      <div class="hero-copy">
+        <div class="hero-badge">Indic AI Guardrail · Hallucination Prevention</div>
+        <h1>AI சொல்லும் மேற்கோள் உண்மையா?<br><em>மூலமே முடிவு செய்யட்டும்.</em></h1>
+        <p class="hero-lede">தமிழ் AI மற்றும் மொழி மாதிரிகளில் பொய் மேற்கோள்களைத் தடுக்கும் பாதுகாப்பு வாயில். இருவேறு வரலாற்றுப் பதிப்புகளுடன் கிரிப்டோகிராஃபிக் (SHA-256) மூலச்சான்று ஒப்பீடு.</p>
+      </div>
+      <div class="hero-seal" aria-hidden="true">
+        <span>மூலம்</span>
+        <b>→</b>
+        <span>சான்று</span>
       </div>
     </section>
 
-    <!-- நடுவர் பார்வைக்கான நேரடி செயல்விளக்கக் குறிப்பேடு (Judges Demonstration Guide) -->
-    <details class="judge-guide-details" id="judgeGuideDetails">
-      <summary class="judge-guide-summary">
-        <span>🎯 நேரடி செயல்விளக்கம்</span>
-      </summary>
-      <div class="judge-guide-body">
-        <p class="judge-guide-desc">
-          சோதனையைத் தொடங்க ஒரு படியைத் தேர்ந்தெடுக்கவும்.
-        </p>
-        <div class="judge-steps-grid">
-          <button type="button" class="judge-step-btn" id="judgeStep1">
-            <span class="step-num">படி 1</span>
-            <span class="step-text">முழு மூல மேற்கோள் & ஆதாரப் பதிவு (குறள் 1)</span>
-          </button>
-          <button type="button" class="judge-step-btn" id="judgeStep2">
-            <span class="step-num">படி 2</span>
-            <span class="step-text">மூலத்தின் ஒரு பகுதி (முதலடி மட்டும்)</span>
-          </button>
-          <button type="button" class="judge-step-btn" id="judgeStep3">
-            <span class="step-num">படி 3</span>
-            <span class="step-text">நேரலை சொல் மாற்றம் & ஒப்பீடு (குறள் 391)</span>
-          </button>
-          <button type="button" class="judge-step-btn" id="judgeStep4">
-            <span class="step-num">படி 4</span>
-            <span class="step-text">AI வரைவு தடுப்பு வாயில் (போலி மேற்கோள் தடை)</span>
-          </button>
-          <button type="button" class="judge-step-btn" id="judgeStep5">
-            <span class="step-num">படி 5</span>
-            <span class="step-text">தொகுப்பில் இல்லாத மேற்கோள் (புறநானூறு)</span>
-          </button>
-        </div>
+    <!-- Judge 1-Click Scenarios -->
+    <section class="judge-strip" aria-label="நடுவர் விரைவுச் சோதனை">
+      <div class="judge-label">⚡ நடுவர் நேரடிச் சோதனை:</div>
+      <div class="judge-buttons">
+        <button type="button" class="judge-btn" id="scenarioExact">
+          <span class="dot dot-green"></span> 1. அசல் திருக்குறள்
+        </button>
+        <button type="button" class="judge-btn" id="scenarioHallucination">
+          <span class="dot dot-red"></span> 2. AI போலி மேற்கோள்
+        </button>
+        <button type="button" class="judge-btn" id="scenarioAltered">
+          <span class="dot dot-amber"></span> 3. சொல் மாற்றம் & Diff
+        </button>
+        <button type="button" class="judge-btn" id="scenarioWitness">
+          <span class="dot dot-purple"></span> 4. இரு பதிப்பு ஒப்பீடு
+        </button>
       </div>
-    </details>
+    </section>
 
-    <!-- =========================================================================
-         பிரிவு 1: மேற்கோள் ஆய்வகம் (Quotation Laboratory)
-         ========================================================================= -->
-    <section id="labTab" class="tab-content active" aria-labelledby="tabBtnLab">
-      <div class="input-card">
-        <div class="input-header">
-          <h2 class="input-title">மேற்கோள் ஆய்வகம் — குறள் சரிபார்ப்பு</h2>
-          <span class="input-hint">சரிபார்க்க வேண்டிய மேற்கோளையும் (விருப்பப்பட்டால் உரிமை கோரல்களையும்) உள்ளிடுங்கள்</span>
-        </div>
+    <!-- Navigation Tabs -->
+    <nav class="tabs" aria-label="முதன்மைப் பிரிவுகள்">
+      <button class="tab active" data-view="gate">🛡️ AI தடுப்பு வாயில் (Guardrail)</button>
+      <button class="tab" data-view="verify">🔍 மேற்கோள் ஆய்வகம்</button>
+      <button class="tab" data-view="forge">✏️ நேரடி மாற்றச் சோதனை</button>
+      <button class="tab" data-view="api">⚡ Developer API</button>
+    </nav>
 
-        <div class="textarea-wrapper">
-          <label for="kuralInput" class="field-label">சரிபார்க்க வேண்டிய மேற்கோள்:</label>
-          <textarea
-            id="kuralInput"
-            class="kural-textarea"
-            rows="3"
-            placeholder="எடுத்துக்காட்டாக:&#10;அகர முதல எழுத்தெல்லாம் ஆதி&#10;பகவன் முதற்றே உலகு."
-            aria-label="சரிபார்க்க வேண்டிய மேற்கோள் உரை"></textarea>
-        </div>
-
-        <!-- விருப்பத் தெரிவுகள்: கூறப்படும் நூல், ஆசிரியர், எண் (Optional Claims) -->
-        <details class="claims-details" id="claimsDetails">
-          <summary class="claims-summary">
-            <span>⚙️ விருப்பத் தெரிவு: மேற்கோள் தொடர்பான உரிமை கோரல்கள் (நூல் / ஆசிரியர் / எண்)</span>
-          </summary>
-          <div class="claims-grid">
-            <div class="claim-field">
-              <label for="claimWorkInput" class="claim-label">கூறப்படும் நூல்:</label>
-              <input type="text" id="claimWorkInput" class="claim-input" placeholder="எ.கா. திருக்குறள்">
-            </div>
-            <div class="claim-field">
-              <label for="claimAuthorInput" class="claim-label">கூறப்படும் ஆசிரியர்:</label>
-              <input type="text" id="claimAuthorInput" class="claim-input" placeholder="எ.கா. திருவள்ளுவர்">
-            </div>
-            <div class="claim-field">
-              <label for="claimVerseInput" class="claim-label">கூறப்படும் குறள் எண்:</label>
-              <input type="number" id="claimVerseInput" class="claim-input" placeholder="எ.கா. 1" min="1" max="1330">
-            </div>
-          </div>
-        </details>
-
-        <div class="input-controls">
-          <div class="char-word-counter" id="textStats">
-            சொற்கள்: <strong id="wordCount">0</strong> | எழுத்துகள்: <strong id="charCount">0</strong>
-          </div>
-          <div class="action-buttons">
-            <button id="clearBtn" class="btn btn-secondary" type="button">
-              <span>🗑️</span> அழித்து விடுக
-            </button>
-            <button id="randomBtn" class="btn btn-secondary" type="button">
-              <span>🎲</span> மாதிரி குறள்
-            </button>
-            <button id="verifyBtn" class="btn btn-primary" type="button">
-              <span>🔍</span> சரிபார்க்கவும்
-            </button>
-          </div>
-        </div>
-
-        <!-- விரைவு மாதிரி மாத்திரைகள் (Presets) -->
-        <div class="examples-container">
-          <span class="examples-label">விரைவு மாதிரி நிலைகள் (ஆறு தீர்ப்புகளையும் சோதிக்க):</span>
-          <div class="example-pills" id="examplePills">
-            <button type="button" class="pill" data-type="exact">1. முழு மூலப் பொருத்தம்</button>
-            <button type="button" class="pill" data-type="orthography_punct">2. வடிவ / நிறுத்தக்குறி வேறுபாடு</button>
-            <button type="button" class="pill" data-type="orthography_sandhi">3. சீர் இடைவெளி வேறுபாடு</button>
-            <button type="button" class="pill" data-type="partial">4. மூலத்தின் ஒரு பகுதி (முதலடி)</button>
-            <button type="button" class="pill" data-type="variation">5. சொல் அல்லது எழுத்து மாற்றம்</button>
-            <button type="button" class="pill" data-type="notfound">6. தொகுப்பில் ஆதாரம் இல்லாதது</button>
-            <button type="button" class="pill" data-type="insufficient">7. போதிய சான்றின்மை (ஒற்றைச் சொல்)</button>
-          </div>
-        </div>
+    <!-- VIEW 1: AI Guardrail (Priority #1) -->
+    <section class="view active" id="view-gate">
+      <div class="section-heading">
+        <h2>AI பதில் வரைவுச் சான்றாய்வு</h2>
+        <span class="step-badge">Zero-Hallucination Gate</span>
       </div>
-
-      <!-- ஆய்வக முடிவுகள் (Lab Results) -->
-      <div id="resultSection" class="result-section" style="display: none;">
-        <!-- தீர்ப்புப் பட்டை -->
-        <div id="verdictBanner" class="verdict-banner">
-          <div class="verdict-icon-container" id="verdictIcon">✓</div>
-          <div class="verdict-text-group">
-            <div class="verdict-badge" id="verdictBadge">சரிபார்க்கப்பட்ட முடிவு</div>
-            <h3 id="verdictTitle" class="verdict-title">மூலத்துடன் பொருந்துகிறது</h3>
-            <p id="verdictSubtitle" class="verdict-subtitle">மூலத் தரவோடு ஒப்பிடப்பட்டு பெறப்பட்ட முடிவு</p>
-          </div>
-          <div class="verdict-status-tag" id="verdictStatusTag">தரவுத்தொகுப்பு மூலம்</div>
-        </div>
-
-        <!-- உரிமை கோரல் முரண்பாட்டு எச்சரிக்கை (Claims Conflict Notice) -->
-        <div id="claimsConflictCard" class="claims-conflict-card" style="display: none;">
-          <h4 class="conflict-title">⚠️ உரிமை கோரல் முரண்பாடு அறிவிப்பு</h4>
-          <ul id="claimsConflictList" class="conflict-list"></ul>
-        </div>
-
-        <!-- விளக்கம் அட்டை -->
-        <div class="result-card explanation-card">
-          <h4 class="card-heading">
-            <span class="heading-icon">📋</span> முடிவு விளக்கம்
-          </h4>
-          <p id="explanationText" class="explanation-content"></p>
-          <div id="wordChangeNote" class="word-change-note" style="display: none;"></div>
-        </div>
-
-        <!-- பக்கவாட்டு சொல் ஒப்பீடு (Side-by-Side Word Diff) -->
-        <div id="candidateContainer" class="result-card candidate-card" style="display: none;">
-          <div class="candidate-header">
-            <h4 class="card-heading">
-              <span class="heading-icon">📖</span> மூலப் பாடம் மற்றும் பக்கவாட்டு ஒப்பீடு
-            </h4>
-            <span id="canonicalCandidateLabel" class="candidate-status-pill">தரவுத் தொகுப்பில் பொருந்தியது</span>
-          </div>
-
-          <!-- மூலக் குறள் பெட்டி -->
-          <div class="canonical-box">
-            <div class="box-caption">செவ்வியல் மூலக் குறள்:</div>
-            <blockquote id="canonicalCouplet" class="canonical-verse"></blockquote>
-            <div class="canonical-meaning">
-              <strong>பொருள் / தெளிவுரை:</strong> <span id="canonicalMeaning"></span>
+      <div class="work-grid">
+        <form class="panel input-panel" id="gateForm">
+          <div class="input-header">
+            <label for="draftInput">AI வழங்கிய பதில் வரைவு</label>
+            <div class="sample-pills">
+              <span>மாதிரிகள்:</span>
+              <button type="button" class="pill-btn" id="pillAiValid">உண்மைப் பதில்</button>
+              <button type="button" class="pill-btn pill-btn-danger" id="pillAiFake">போலி மேற்கோள்</button>
             </div>
           </div>
-
-          <!-- பக்கவாட்டு சொல் ஒப்பீடு -->
-          <div class="comparison-container">
-            <div class="comparison-header">
-              <h5 class="comparison-title">பக்கவாட்டு சொல் ஒப்பீடு (சொல் வாரியான ஆய்வு)</h5>
-              <div class="diff-legend">
-                <span class="legend-item"><span class="legend-chip match"></span> பொருந்திய சொல்</span>
-                <span class="legend-item"><span class="legend-chip diff"></span> விடுபட்ட சொல்</span>
-                <span class="legend-item"><span class="legend-chip extra"></span> மாற்றப்பட்ட சொல்</span>
-              </div>
-            </div>
-
-            <div class="comparison-grid">
-              <div class="comparison-col input-col">
-                <div class="col-header">
-                  <span class="col-title">நீங்கள் உள்ளிட்ட உரை:</span>
-                </div>
-                <div id="diffInputTokens" class="tokens-flow"></div>
-              </div>
-
-              <div class="comparison-col canonical-col">
-                <div class="col-header">
-                  <span class="col-title">மூலத் தரவுப் பாடம்:</span>
-                </div>
-                <div id="diffCanonicalTokens" class="tokens-flow"></div>
-              </div>
-            </div>
+          <textarea id="draftInput" rows="7" placeholder="மேற்கோள் உள்ள AI பதிலை இங்கே ஒட்டுங்கள்…" required></textarea>
+          <div class="manual-quote-box">
+            <label for="gateQuote">தனியாகச் சரிபார்க்க வேண்டிய மேற்கோள் <span class="muted">(விரும்பினால் மட்டும்)</span></label>
+            <input id="gateQuote" placeholder="தானாகக் கண்டறியத் தவறினால் மட்டும் உள்ளிடவும்" />
           </div>
-
-          <!-- பகுப்பாய்வு அளவீடுகள் -->
-          <div class="metrics-grid">
-            <div class="metric-card">
-              <span class="metric-num" id="metricInputWords">0</span>
-              <span class="metric-title">உள்ளிட்ட சொற்கள்</span>
-            </div>
-            <div class="metric-card">
-              <span class="metric-num" id="metricCanonicalWords">7</span>
-              <span class="metric-title">மூலச் சொற்கள் (சீர்கள்)</span>
-            </div>
-            <div class="metric-card">
-              <span class="metric-num" id="metricMatchedWords">0</span>
-              <span class="metric-title">பொருந்திய சொற்கள்</span>
-            </div>
-            <div class="metric-card">
-              <span class="metric-num" id="metricSimilarity">0%</span>
-              <span class="metric-title">சொல் ஒப்புமை விகிதம்</span>
-            </div>
+          <div class="button-row">
+            <button class="primary-button" type="submit">வரைவைச் சரிபார் <span aria-hidden="true">↗</span></button>
+            <button class="text-button" id="clearGate" type="button">அழி</button>
           </div>
-
-          <!-- அதிகாரப்பூர்வ ஆதாரப் பதிவு -->
-          <div class="evidence-record-container">
-            <h5 class="evidence-record-heading">📑 ஆதாரப் பதிவு</h5>
-            <div class="evidence-table">
-              <div class="ev-row">
-                <span class="ev-cell ev-label">நூல் & ஆசிரியர்</span>
-                <span class="ev-cell ev-val" id="evWorkAuthor">திருக்குறள் — திருவள்ளுவர்</span>
-              </div>
-              <div class="ev-row">
-                <span class="ev-cell ev-label">குறள் எண்</span>
-                <span class="ev-cell ev-val" id="evVerseNumber">—</span>
-              </div>
-              <div class="ev-row">
-                <span class="ev-cell ev-label">அதிகாரம்</span>
-                <span class="ev-cell ev-val" id="evChapter">—</span>
-              </div>
-              <div class="ev-row">
-                <span class="ev-cell ev-label">பால் & இயல்</span>
-                <span class="ev-cell ev-val" id="evSectionGroup">—</span>
-              </div>
-            </div>
+        </form>
+        <div class="panel result-panel" id="gateResult" aria-live="polite">
+          <div class="empty-state">
+            <div class="empty-icon">🛡️</div>
+            <h3>சான்றாய்வு முடிவுகள்</h3>
+            <p>AI பதிலிலுள்ள மேற்கோள்கள் தானாகப் பிரித்தெடுக்கப்பட்டு, மூலத்துடன் ஒப்பிட்டு அனுமதிக்கப்படும் அல்லது தடுக்கப்படும்.</p>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- =========================================================================
-         பிரிவு 2: குறள் மாற்றிப் பார்ப்பு (Forgery Forge / Interactive Alteration)
-         ========================================================================= -->
-    <section id="forgeTab" class="tab-content" aria-labelledby="tabBtnForge" style="display: none;">
-      <div class="forge-intro-card">
-        <h2 class="forge-heading">குறள் மாற்றிப் பார்ப்பு — போலி மேற்கோள் ஆய்வுக்கூடம்</h2>
-        <p class="forge-desc">
-          ஒரு குறளை ஏற்றி, சொற்களை மாற்றி சரிபார்க்கவும்.
-        </p>
+    <!-- VIEW 2: Verify Lab -->
+    <section class="view" id="view-verify" hidden>
+      <div class="section-heading">
+        <h2>மேற்கோள் ஆய்வு & பதிப்புச் சான்று</h2>
+        <span class="step-badge">Multi-Witness Engine</span>
       </div>
-
-      <!-- குறள் தேர்ந்தெடுக்கும் பகுதி -->
-      <div class="forge-picker-card">
-        <div class="picker-header">
-          <label for="forgeKuralNumber" class="picker-label">தொடக்கக் குறளைத் தேர்ந்தெடுக்கவும் (1 முதல் 1330 வரை):</label>
-          <div class="picker-input-group">
-            <input type="number" id="forgeKuralNumber" class="kural-num-input" min="1" max="1330" value="1">
-            <button type="button" id="forgeLoadBtn" class="btn btn-secondary">ஏற்றுக</button>
-            <button type="button" id="forgeRandomBtn" class="btn btn-secondary">🎲 ஏதேனும் ஒரு குறள்</button>
-          </div>
-        </div>
-
-        <!-- மாதிரி கட்டுப்பாடுகள் (Demo Controls) -->
-        <div class="forge-demo-controls">
-          <span class="demo-title">மாதிரி சோதனைக் கட்டுப்பாடுகள்:</span>
-          <div class="demo-btn-group">
-            <button type="button" class="btn btn-secondary btn-sm" id="demoExactBtn">1. முழு மூல மேற்கோள்</button>
-            <button type="button" class="btn btn-secondary btn-sm" id="demoPartialBtn">2. பகுதி மேற்கோள்</button>
-            <button type="button" class="btn btn-secondary btn-sm" id="demoAlterBtn">3. ஒரு சொல் மாற்றம்</button>
-            <button type="button" class="btn btn-secondary btn-sm" id="demoUnsupportedBtn">4. தொகுப்பில் இல்லாதது</button>
-          </div>
-        </div>
-
-        <!-- நேரலை திருத்தப் பெட்டி (Interactive Textarea) -->
-        <div class="forge-editor-area">
-          <label for="forgeTextarea" class="field-label">குறளை மாற்றி எழுதுங்கள் (சொற்களை மாற்றவும், நீக்கவும், சேர்க்கவும்):</label>
-          <textarea id="forgeTextarea" class="forge-textarea" rows="3"></textarea>
-          <div class="forge-editor-footer">
-            <span id="forgeStats">சொற்கள்: 0 | எழுத்துகள்: 0</span>
-            <button type="button" id="forgeVerifyBtn" class="btn btn-primary">
-              <span>🔍</span> மாற்றத்தைச் சரிபார்க்கவும்
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- மாற்றிப் பார்ப்பு நேரலை முடிவுகள் -->
-      <div id="forgeResultArea" class="forge-result-area" style="display: none;">
-        <div id="forgeVerdictBanner" class="verdict-banner">
-          <div class="verdict-icon-container" id="forgeVerdictIcon">✓</div>
-          <div class="verdict-text-group">
-            <div class="verdict-badge" id="forgeVerdictBadge">முடிவு நிலை</div>
-            <h3 id="forgeVerdictTitle" class="verdict-title">—</h3>
-            <p id="forgeVerdictSubtitle" class="verdict-subtitle">—</p>
-          </div>
-        </div>
-
-        <div class="result-card">
-          <h4 class="card-heading">
-            <span class="heading-icon">⚖️</span> மாற்றப்பட்ட உரை மற்றும் மூலக் குறள் பக்கவாட்டு ஆய்வு
-          </h4>
-          <div class="forge-canonical-info" id="forgeCanonicalInfo">
-            <span class="info-badge">ஒப்பிடப்படும் மூலக் குறள் விவரம்:</span>
-            <span id="forgeKuralMeta" class="kural-meta-text">—</span>
-            <blockquote id="forgeCanonicalCouplet" class="forge-canonical-text">—</blockquote>
-          </div>
-          <p id="forgeExplanation" class="explanation-content"></p>
-
-          <div class="comparison-grid">
-            <div class="comparison-col input-col">
-              <div class="col-header">
-                <span class="col-title">நீங்கள் மாற்றிய உரை:</span>
-              </div>
-              <div id="forgeDiffInput" class="tokens-flow"></div>
+      <div class="work-grid">
+        <form class="panel input-panel" id="verifyForm">
+          <label for="quoteInput">சரிபார்க்க வேண்டிய தமிழ் மேற்கோள்</label>
+          <textarea id="quoteInput" rows="4" placeholder="திருக்குறள் வரியை இங்கே ஒட்டுங்கள்…" required></textarea>
+          <div class="field-row">
+            <div>
+              <label for="claimedWork">கூறப்படும் நூல்</label>
+              <input id="claimedWork" value="திருக்குறள்" />
             </div>
-
-            <div class="comparison-col canonical-col">
-              <div class="col-header">
-                <span class="col-title">மூலத் தரவுப் பாடம்:</span>
-              </div>
-              <div id="forgeDiffCanonical" class="tokens-flow"></div>
+            <div>
+              <label for="claimedAuthor">கூறப்படும் ஆசிரியர்</label>
+              <input id="claimedAuthor" value="திருவள்ளுவர்" />
             </div>
           </div>
-
-          <div class="warning-callout">
-            <strong>⚠️ நினைவூட்டல்:</strong> ஒரு மேற்கோள் மூலக் குறளோடு நெருக்கமாக இருப்பது மட்டும் அதற்கு ஏற்பளிக்கப் போதாது. மூலத்தில் இல்லாத ஒரு சொல்லைக் கொண்ட குறள் ஒருபோதும் செவ்வியல் மூலமாக ஏற்றுக்கொள்ளப்படாது.
+          <div class="field-row number-row">
+            <div>
+              <label for="claimedNumber">கூறப்படும் எண்</label>
+              <input id="claimedNumber" type="number" min="1" max="1330" placeholder="எ.கா. 1" />
+            </div>
+            <button class="secondary-button" id="lookupNumber" type="button">எண் மூலம் தேடு</button>
+          </div>
+          <div class="button-row">
+            <button class="primary-button" type="submit">மூலத்துடன் சரிபார் <span aria-hidden="true">↗</span></button>
+            <button class="text-button" type="button" id="sampleQuote">மாதிரி</button>
+            <button class="text-button" type="button" id="clearQuote">அழி</button>
+          </div>
+        </form>
+        <div class="panel result-panel" id="verifyResult" aria-live="polite">
+          <div class="empty-state">
+            <div class="empty-icon">✓</div>
+            <h3>முடிவுக்காகக் காத்திருக்கிறது</h3>
+            <p>மேற்கோளை உள்ளிட்டதும் வரலாற்றுப் பதிப்புச் சான்று மற்றும் ஒப்பீடு இங்கே தோன்றும்.</p>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- =========================================================================
-         பிரிவு 3: AI பதில் சான்றாய்வு (AI Truth Gate)
-         ========================================================================= -->
-    <section id="aiGateTab" class="tab-content" aria-labelledby="tabBtnAiGate" style="display: none;">
-      <div class="gate-intro-card">
-        <h2 class="gate-heading">AI பதில் சான்றாய்வு — போலிக் குறள் தடுப்பு வாயில்</h2>
-        <p class="gate-desc">
-          செயற்கை நுண்ணறிவோ (பெருமளவு மொழி மாதிரிகள் போன்றவை) அல்லது பிறரோ உருவாக்கிய வரைவு பதில்களில் உள்ள திருக்குறள் மேற்கோள்களைப் பிரித்தெடுத்து, திரிபு அல்லது கற்பனைகள் இருந்தால் வெளியீட்டுக்குத் தடையிடும் பாதுகாப்பு வாயில்.
-        </p>
-        <div class="gate-notice-chip">
-          ℹ️ இக்கருவி இச்செயலியினுள் பரிசீலிக்கப்படும் வரைவுகளை மட்டுமே ஆய்வு செய்கிறது; பிற வெளிப்புற சேவைகளை நேரடியாகக் கட்டுப்படுத்தாது.
-        </div>
+    <!-- VIEW 3: Forge & Diff -->
+    <section class="view" id="view-forge" hidden>
+      <div class="section-heading">
+        <h2>நேரடி மாற்றச் சோதனை (Adversarial Testing)</h2>
+        <span class="step-badge">Word-Level Diff</span>
       </div>
-
-      <!-- வரைவு உள்ளீட்டு அட்டை -->
-      <div class="gate-input-card">
-        <div class="gate-header">
-          <label for="aiDraftTextarea" class="field-label">பரிசீலிக்க வேண்டிய AI வரைவு உரையை உள்ளிடவும்:</label>
-          <div class="gate-presets">
-            <span class="presets-title">மாதிரி AI பதில்கள்:</span>
-            <button type="button" class="btn btn-secondary btn-sm" id="presetAiAuthentic">மாதிரி 1: உண்மையான குறள் கொண்ட AI பதில்</button>
-            <button type="button" class="btn btn-secondary btn-sm" id="presetAiAltered">மாதிரி 2: சொல் மாற்றப்பட்ட போலி குறள் கொண்ட AI பதில்</button>
-            <button type="button" class="btn btn-secondary btn-sm" id="presetAiNonKural">மாதிரி 3: இல்லாத வரியைக் குறள் எனக் கூறும் AI பதில்</button>
+      <div class="panel forge-controls">
+        <label for="verseNumber">குறள் எண்</label>
+        <input id="verseNumber" type="number" min="1" max="1330" value="1">
+        <button class="secondary-button" id="loadVerse" type="button">ஏற்று</button>
+        <span id="forgeSourceNote" class="muted"></span>
+      </div>
+      <div class="work-grid">
+        <div class="panel input-panel">
+          <label for="forgeInput">உரை மாற்றம் செய்து சோதிக்கவும்</label>
+          <textarea id="forgeInput" rows="5" placeholder="மூலக் குறளை ஏற்றி ஏதேனும் ஒரு சொல்லை மாற்றுங்கள்…"></textarea>
+          <div class="button-row">
+            <button class="primary-button" id="forgeCheck" type="button">மாற்றத்தைச் சோதி <span aria-hidden="true">↗</span></button>
+            <button class="text-button" id="clearForge" type="button">அழி</button>
           </div>
         </div>
-
-        <textarea
-          id="aiDraftTextarea"
-          class="ai-draft-textarea"
-          rows="6"
-          placeholder="எடுத்துக்காட்டாக: திருவள்ளுவர் கல்வியின் பெருமையைப் பற்றி கூறும்போது 'கற்க கசடறக் கற்பவை கற்றபின் நிற்க அதற்குத் தக' என்று கூறியுள்ளார்..."></textarea>
-
-        <!-- ஆய்வு முறை தெரிவு (Automatic vs Manual Mode) -->
-        <div class="gate-mode-selector">
-          <span class="mode-title">ஆய்வு முறை:</span>
-          <label class="mode-radio-label">
-            <input type="radio" name="gateMode" value="auto" checked id="gateModeAuto">
-            <span>தானியங்கி மேற்கோள் கண்டறிதல் (மேற்கோள் குறிகள் & லேபிள்கள்)</span>
-          </label>
-          <label class="mode-radio-label">
-            <input type="radio" name="gateMode" value="manual" id="gateModeManual">
-            <span>கையால் மேற்கோளைக் குறிப்பிடும் முறை</span>
-          </label>
-        </div>
-
-        <!-- கையால் மேற்கோள் குறிப்பிடும் புலம் -->
-        <div id="manualQuoteSpanContainer" class="manual-span-box" style="display: none;">
-          <label for="manualQuoteInput" class="field-label">ஆய்வு செய்ய வேண்டிய குறிப்பிட்ட மேற்கோள் பகுதி:</label>
-          <input type="text" id="manualQuoteInput" class="manual-input" placeholder="வரைவில் உள்ள குறள் வரியை மட்டும் இங்கு ஒட்டவும்">
-        </div>
-
-        <div class="gate-action-row">
-          <button type="button" id="evaluateDraftBtn" class="btn btn-primary">
-            <span>🛡️</span> AI வரைவைச் சான்றாய்க
-          </button>
-          <button type="button" id="clearDraftBtn" class="btn btn-secondary">
-            <span>🗑️</span> வரைவை அழிக்க
-          </button>
-        </div>
-      </div>
-
-      <!-- சான்றாய்வு முடிவுகள் (Gate Evaluation Results) -->
-      <div id="gateResultArea" class="gate-result-area" style="display: none;">
-        <!-- வாயில் நிலை பட்டை (Overall Status Banner) -->
-        <div id="gateStatusBanner" class="gate-status-banner">
-          <div class="gate-status-icon" id="gateStatusIcon">🛡️</div>
-          <div class="gate-status-text">
-            <h3 id="gateStatusTitle" class="gate-status-title">—</h3>
-            <p id="gateStatusSummary" class="gate-status-summary">—</p>
+        <div class="panel result-panel" id="forgeResult" aria-live="polite">
+          <div class="empty-state">
+            <div class="empty-icon">✎</div>
+            <h3>மாற்றச் சோதனை</h3>
+            <p>சொற்களை மாற்றியமைத்து ஒப்பீட்டு வேறுபாட்டைக் காண்க.</p>
           </div>
-        </div>
-
-        <!-- மாற்றீடு செய்யப்பட்ட அறிவிப்பு பலகை (Replacement Audit Notice) -->
-        <div id="aiReplaceNotice" class="ai-replace-notice" style="display: none;"></div>
-
-        <!-- கண்டறியப்பட்ட மேற்கோள்கள் பட்டியல் -->
-        <div class="result-card">
-          <h4 class="card-heading">
-            <span class="heading-icon">🔎</span> கண்டறியப்பட்ட மேற்கோள்கள் மற்றும் சான்றாய்வு விவரம்
-          </h4>
-          <div id="spansListContainer" class="spans-list-container"></div>
         </div>
       </div>
     </section>
+
+    <!-- VIEW 4: Developer API Integration -->
+    <section class="view" id="view-api" hidden>
+      <div class="section-heading">
+        <h2>Developer API & Middleware Integration</h2>
+        <span class="step-badge">REST · Python · LangChain</span>
+      </div>
+      <div class="panel api-panel">
+        <p class="api-lead">எந்தவொரு தமிழ் AI செயலி அல்லது RAG கட்டமைப்பிலும் மெய்ப்பொருளை 2 வரிகளில் இணைக்கலாம்:</p>
+        
+        <div class="code-block">
+          <div class="code-title">Python / LangChain Guardrail Example</div>
+          <pre><code>import requests
+
+def verify_tamil_citation(ai_draft: str) -> dict:
+    response = requests.post(
+        "http://localhost:5173/api/gate",
+        json={"draft": ai_draft}
+    )
+    data = response.json()
+    if not data.get("approved"):
+        # AI பதில் தடுத்து நிறுத்தப்படுகிறது (Zero Hallucination)
+        raise ValueError(f"உண்மைத்தன்மை உறுதிப்படுத்தப்படவில்லை: {data['results']}")
+    return data</code></pre>
+        </div>
+
+        <div class="code-block">
+          <div class="code-title">cURL API Request</div>
+          <pre><code>curl -X POST http://localhost:5173/api/verify \
+  -H "Content-Type: application/json" \
+  -d '{"text": "அகர முதல எழுத்தெல்லாம் ஆதி பகவன் முதற்றே உலகு"}'</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <span>மெய்ப்பொருள் · தமிழ் இலக்கிய உண்மைத்தன்மை பாதுகாப்பு வாயில்</span>
+      <span id="footerSource">மூலத் தரவு: Project Madurai Unicode 2000 & Community Open JSON</span>
+    </footer>
   </main>
-
-  <!-- அடிக்குறிப்பு (Footer) -->
-  <footer class="site-footer" role="contentinfo">
-    <div class="footer-container">
-      <p class="footer-brand"><strong>மெய்ப்பொருள்</strong> — “மேற்கோள் மட்டும் போதாது; மூலச்சான்று வேண்டும்.”</p>
-      <p class="footer-note">தமிழ் ஹேக்கத்தான் 2026 படைப்பு | வள்ளுவன் வாக்கு மெய்ப்பிக்கப்படும் தளம்</p>
-    </div>
-  </footer>
-
-  <!-- தரவுத்தொகுப்பு மற்றும் பயன்பாட்டு நிரல்கள் -->
-  <script src="data/corpus_meta.js?v=meypporul_final"></script>
-  <script src="data/tirukkural_data.js?v=meypporul_final"></script>
-  <script src="app.js?v=text-clean-v3"></script>
+  <script src="app.js"></script>
 </body>
 </html>

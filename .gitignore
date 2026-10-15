@@ -1,5 +1,6 @@
-node_modules/
+data/meypporul.sqlite3
+data/meypporul.sqlite3-shm
+data/meypporul.sqlite3-wal
 __pycache__/
-*.py[cod]
-.DS_Store
-Thumbs.db
+backend/__pycache__/
+tests/__pycache__/
