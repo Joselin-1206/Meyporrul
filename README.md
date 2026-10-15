@@ -1,70 +1,77 @@
-# மெய்ப்பொருள் — Full-stack prototype
+# மெய்ப்பொருள் — முழுமையான மென்பொருள் முன்மாதிரி
 
-Tamil literary quote verifier with a browser frontend, Python JSON API, and SQLite corpus database.
+தமிழ் இலக்கிய மேற்கோள்களை மூலத் தரவுடன் ஒப்பிடும் வலைச் செயலி. உலாவி முன்பக்கம், Python API, SQLite தரவுத்தளம் ஆகியவற்றைக் கொண்டது.
 
-## Requirements
+## தேவைகள்
 
-- Windows laptop
-- Python 3.10 or newer (standard library only; no pip install required)
-- Current Chrome, Edge, or Firefox
+- Windows கணினி
+- Python 3.10 அல்லது அதற்குப் பிந்தைய பதிப்பு (கூடுதல் தொகுப்புகளை நிறுவத் தேவையில்லை)
+- சமீபத்திய Chrome, Edge அல்லது Firefox உலாவி
 
-## Run the application
+## செயலியை இயக்குதல்
 
-1. From this folder, double-click `run.bat`.
-2. Keep the opened terminal running.
-3. Use the URL printed in the terminal. The app tries ports 5173–5182 and picks the first available one.
-4. Add `/api/health` to that URL to confirm the backend and 1,330-record database are ready.
+1. இந்தக் கோப்புறை திறந்திருக்கும் நிலையில் `run.bat` கோப்பை இருமுறை சொடுக்கவும்.
+2. திறக்கும் கட்டளைச் சாளரத்தை இயங்கிக் கொண்டிருக்க விடவும்.
+3. சாளரத்தில் காட்டப்படும் முகவரியை உலாவியில் திறக்கவும். `5173` முதல் `5182` வரையிலான முதல் காலித் துறைமுகத்தைச் செயலி தேர்ந்தெடுக்கும்.
+4. சேவையும் 1,330 குறள்கள் கொண்ட தரவுத்தளமும் இயங்குகிறதா எனப் பார்க்க, அந்த முகவரியின் முடிவில் `/api/health` சேர்க்கவும்.
 
-`run.bat` imports the included Project Madurai HTML snapshot, then starts the app. The server reads `data/tirukkural.json`, validates the 1–1330 numbering, and creates/refreshes `data/meypporul.sqlite3`; the database is generated locally and is intentionally not committed. The server selects the first free local port from 5173 through 5182. A hosted environment can supply `PORT`; public deployment should use a production-grade server rather than Python's built-in HTTP server.
+`run.bat` முதலில் சேர்க்கப்பட்டுள்ள Project Madurai HTML மூலப் பதிவை SQLite-இல் ஏற்றும்; பின்னர் செயலியைத் தொடங்கும். `data/tirukkural.json` கோப்பிலுள்ள குறள் எண்கள் 1–1330 வரை சரிபார்க்கப்பட்டு, `data/meypporul.sqlite3` தரவுத்தளம் கணினியில் உருவாக்கப்படும். இந்தத் தரவுத்தளம் GitHub-இல் சேர்க்கப்படாது; JSON கோப்பிலிருந்து மீண்டும் உருவாக்கலாம். வழங்கி `PORT` என்ற சூழல் மாறியைத் தந்தால், அதைச் செயலி பயன்படுத்தும். இணையத்தில் வெளியிடும்போது Python-இன் உள்ளமைந்த HTTP வழங்கிக்குப் பதிலாக உற்பத்திப் பயன்பாட்டுக்கான வழங்கியைப் பயன்படுத்த வேண்டும்.
 
-To refresh the source corpus when internet is available, run `node scripts/fetch_corpus.js`. Review the downloaded data before presenting it as an authoritative edition. The current dataset source is <https://github.com/tk120404/thirukkural> and does not claim to be a critical or institutionally certified edition.
+இணைய இணைப்புடன் குறள் மூலத் தரவை மீண்டும் பெற:
 
-## Kural Witness Board — edition comparison
+```powershell
+node scripts/fetch_corpus.js
+```
 
-The quote result has a **பதிப்புகளுடன் ஒப்பிடு** action. It displays each ingested source reading and printed number separately, marks exact matches, text variants, and text-to-number conflicts, and never silently rewrites a source. `run.bat` imports the included source snapshot automatically. To import it manually, run:
+தரவிறக்கிய பதிவுகளைச் சரிபார்த்த பிறகே பயன்படுத்தவும். தற்போதைய தரவு மூலம் [tk120404/thirukkural](https://github.com/tk120404/thirukkural). இது விமர்சனப் பதிப்போ அல்லது நிறுவனம் சான்றளித்த பதிப்போ எனக் கூறப்படவில்லை.
+
+## பதிப்புகளுடன் ஒப்பிடுதல்
+
+மேற்கோள் முடிவில் உள்ள **பதிப்புகளுடன் ஒப்பிடு** செயல், இறக்குமதி செய்யப்பட்ட மூலங்களில் உள்ள உரையையும் அச்சிடப்பட்ட குறள் எண்ணையும் தனித்தனியாகக் காட்டும். ஒரே உரை, உரை வேறுபாடு, உரைக்கும் எண்ணுக்கும் இடையிலான முரண்பாடு ஆகியவற்றைக் குறிக்கும்; மூலத்தில் உள்ள எண்ணைத் தானாக மாற்றாது. `run.bat` சேர்க்கப்பட்ட Project Madurai மூலப் பதிவைத் தானாக ஏற்றும். கைமுறையாக ஏற்ற:
 
 ```powershell
 python scripts/import_project_madurai.py
 ```
 
-The importer reads the saved source snapshot when available (otherwise downloads it), keeps the complete HTML including its attribution header at `data/source_snapshots/project_madurai_pmuni0001.html`, records its SHA-256, and stores the literal printed label separately from the text-matched Kural reference. Duplicate labels or labels that differ from the text are surfaced as conflicts; the source label is never silently rewritten. Reload the page after import.
+மூல HTML கிடைத்தால் அதையே பயன்படுத்தும்; இல்லையெனில் இணையத்திலிருந்து பதிவிறக்கும். முழு HTML மற்றும் அதன் உரிமைக் குறிப்பு `data/source_snapshots/project_madurai_pmuni0001.html` கோப்பில் வைக்கப்பட்டு, SHA-256 குறியீடும் பதிவு செய்யப்படும். மூலத்தில் மீண்டும் வரும் எண்களும், உரைக்கும் அச்சிடப்பட்ட எண்ணுக்கும் உள்ள வேறுபாடுகளும் அப்படியே காட்டப்படும்; மூல எண்ணை அமைதியாகத் திருத்தாது.
 
-Source: <https://www.projectmadurai.org/pm_etexts/utf8/pmuni0001.html>. Project Madurai permits free distribution provided its header is kept intact; the importer retains the complete source page. For public redistribution, review every source's terms and attribution requirements.
+மூலம்: [Project Madurai — திருக்குறள்](https://www.projectmadurai.org/pm_etexts/utf8/pmuni0001.html). இந்தத் திட்டத்தில் முழு மூல HTML-உம் அதன் அடையாளக் குறிப்பும் சேர்க்கப்பட்டுள்ளன. பிற இடங்களில் மறுபகிர்வதற்கு முன் ஒவ்வொரு தரவு மூலத்தின் உரிம நிபந்தனைகளையும் சரிபார்க்கவும்.
 
-## Project structure
+## கோப்புகளின் அமைப்பு
 
 ```text
-index.html                 Tamil frontend structure
-style.css                  Responsive presentation and comparison styling
-app.js                     UI actions, API calls, rendering and word diff
-backend/server.py          HTTP server, verification logic and API routes
-scripts/import_project_madurai.py  Edition snapshot importer and parser
-data/tirukkural.json       Source corpus input (1,330 records)
-data/meypporul.sqlite3     Generated local SQLite database
-scripts/fetch_corpus.js    Dataset download and numbering validation
-tests/test_backend.py      Backend verification tests
-run.bat                    Windows startup command
+index.html                              தமிழ் பயனர் இடைமுகம்
+style.css                               தோற்றம் மற்றும் ஒப்பீட்டுப் பாணிகள்
+app.js                                  பயனர் செயல்கள் மற்றும் API இணைப்பு
+backend/server.py                       API, சரிபார்ப்பு மற்றும் HTTP சேவை
+scripts/import_project_madurai.py       பதிப்பு மூலப் பதிவை இறக்குமதி செய்யும் நிரல்
+data/tirukkural.json                    1,330 குறள்கள் கொண்ட மூலத் தரவு
+data/meypporul.sqlite3                  இயக்கும்போது உருவாகும் SQLite தரவுத்தளம்
+data/source_snapshots/                  சேர்க்கப்பட்ட மூல HTML பதிவு
+scripts/fetch_corpus.js                 தரவைப் பெறுதல் மற்றும் எண் சரிபார்ப்பு
+tests/test_backend.py                   பின்புறச் சேவைச் சோதனைகள்
+run.bat                                 Windows-இல் செயலியைத் தொடங்கும் கோப்பு
 ```
 
-## Backend API
+## API வழிகள்
 
-- `GET /api/health` — service and corpus status
-- `GET /api/kurals` — corpus records for the frontend
-- `GET /api/kurals/{number}` — one Kural by number
-- `GET /api/witness/{number}` — imported readings for one Kural, with provenance and discrepancy labels
-- `POST /api/verify` — JSON body: `{"text":"Tamil quote"}`
-- `POST /api/gate` — JSON body: `{"draft":"...","quote":"optional selected quote"}`
+- `GET /api/health` — சேவை நிலை மற்றும் குறள் எண்ணிக்கை
+- `GET /api/kurals` — முன்பக்கத்திற்கான குறள் பதிவுகள்
+- `GET /api/kurals/{number}` — குறிப்பிட்ட எண் கொண்ட குறள்
+- `GET /api/witness/{number}` — குறிப்பிட்ட குறளுக்கான இறக்குமதி செய்யப்பட்ட பதிப்பு வாசகங்கள் மற்றும் மூல விவரங்கள்
+- `POST /api/verify` — `{"text":"சரிபார்க்க வேண்டிய தமிழ் உரை"}` வடிவில் மேற்கோளைச் சரிபார்க்கும்
+- `POST /api/gate` — `{"draft":"வரைவு","quote":"விருப்பமான மேற்கோள்"}` வடிவில் வரைவிலுள்ள மேற்கோள்களை ஆய்வு செய்யும்
 
-The verification API returns `exact`, `format`, `partial`, `altered`, `not-found`, or `insufficient` plus a source record when one is found. Approximate similarity only locates a possible source; it never certifies an altered quote as authentic. The gate checks only the pasted draft and is not connected to external AI providers.
+சரிபார்ப்பு முடிவு `exact`, `format`, `partial`, `altered`, `not-found` அல்லது `insufficient` ஆக இருக்கும். அருகாமை உரைத் தேடல் சாத்தியமான மூலத்தைக் கண்டறிய உதவும்; மாற்றிய உரையை உண்மையான மேற்கோள் எனச் சான்றளிக்காது. AI பதில் வாயில் இச்செயலியில் ஒட்டப்பட்ட வரைவையே ஆய்வு செய்கிறது; வெளிப்புற AI சேவைகளை நேரடியாகக் கட்டுப்படுத்தாது.
 
-## Run backend tests
+## பின்புறச் சேவைச் சோதனைகள்
 
 ```powershell
 python -m unittest discover -s tests -v
 ```
 
-## Hosting notes
+## இணையத்தில் வெளியிடுதல் மற்றும் வரம்புகள்
 
-Pushing this repository to GitHub publishes the source code; it does not make the Python API run as a public website. For a public deployment, connect the repository to a Python hosting service and use a production WSGI/ASGI server. Add reviewed/versioned literary editions, database migrations, rate limits, logging/monitoring, backups, and human review for source conflicts before production use. The Witness Board is only as complete as its imported snapshots; a missing row means “not in this local snapshot,” not “the source has no verse.” An external AI integration would require routing generated drafts through the verification API before displaying them.
+GitHub-இல் குறியீட்டைச் சேர்ப்பது அதை இணையச் செயலியாக இயக்காது. பொதுப் பயன்பாட்டிற்கு Python வழங்கிச் சேவையை இயக்கக்கூடிய ஹோஸ்டிங் சேவையில் இந்தக் களஞ்சியத்தை இணைத்து, உற்பத்திப் பயன்பாட்டுக்கான WSGI/ASGI வழங்கியைப் பயன்படுத்த வேண்டும். விரிவான பயன்பாட்டிற்கு முன் பதிப்புகளை நிபுணர் மதிப்பாய்வுடன் நிர்வகித்தல், தரவுத்தள மாற்றப் பதிவுகள், கோரிக்கை வரம்புகள், கண்காணிப்பு, காப்புப் பிரதிகள், மூல முரண்பாடுகளுக்கான மனித மதிப்பாய்வு ஆகியவை தேவை.
 
-“No match” means no match in the currently loaded corpus. It does not prove that the line is absent from all Tamil literature.
+பதிப்புகளுடன் ஒப்பிடும் பகுதி இறக்குமதி செய்யப்பட்ட மூலப் பதிவுகளின் அளவுக்கு மட்டுமே செயல்படும். இத்தொகுப்பில் பதிவு இல்லாதது, அந்த இலக்கியத்தில் அந்தப் பாடல் இல்லை என்பதை நிரூபிக்காது. “பொருத்தம் இல்லை” என்ற முடிவு, தற்போது ஏற்றப்பட்ட தரவுத்தொகுப்பில் பொருத்தம் கிடைக்கவில்லை என்பதையே குறிக்கும்; தமிழ் இலக்கியம் முழுவதிலும் அந்த வரி இல்லை என்பதல்ல.
