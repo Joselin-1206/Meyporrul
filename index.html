@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="ta">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#1a382b">
+  <title>மெய்ப்பொருள் — AI மேற்கோள் தடுப்பு வாயில் & மூலச்சான்று இயந்திரம்</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Tamil:wght@400;600;700&family=Noto+Sans+Tamil:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#முகப்பு" aria-label="மெய்ப்பொருள் முகப்பு">
+      <span class="brand-mark" aria-hidden="true">மெ</span>
+      <span>
+        <strong>மெய்ப்பொருள்</strong>
+        <small>AI உரைத் தடுப்பு வாயில் · பல பதிப்பு மூலச்சான்று</small>
+      </span>
+    </a>
+    <div class="topbar-right">
+      <div class="source-status" id="sourceStatus" role="status">1330 குறள்கள் · SQLite தயார்</div>
+    </div>
+  </header>
+
+  <main id="முகப்பு">
+    <section class="hero">
+      <div class="hero-copy">
+        <div class="hero-badge">Indic AI Guardrail · Hallucination Prevention</div>
+        <h1>AI சொல்லும் மேற்கோள் உண்மையா?<br><em>மூலமே முடிவு செய்யட்டும்.</em></h1>
+        <p class="hero-lede">தமிழ் AI மற்றும் மொழி மாதிரிகளில் பொய் மேற்கோள்களைத் தடுக்கும் பாதுகாப்பு வாயில். இருவேறு வரலாற்றுப் பதிப்புகளுடன் கிரிப்டோகிராஃபிக் (SHA-256) மூலச்சான்று ஒப்பீடு.</p>
+      </div>
+      <div class="hero-seal" aria-hidden="true">
+        <span>மூலம்</span>
+        <b>→</b>
+        <span>சான்று</span>
+      </div>
+    </section>
+
+    <!-- Judge 1-Click Scenarios -->
+    <section class="judge-strip" aria-label="நடுவர் விரைவுச் சோதனை">
+      <div class="judge-label">⚡ நடுவர் நேரடிச் சோதனை:</div>
+      <div class="judge-buttons">
+        <button type="button" class="judge-btn" id="scenarioExact">
+          <span class="dot dot-green"></span> 1. அசல் திருக்குறள்
+        </button>
+        <button type="button" class="judge-btn" id="scenarioHallucination">
+          <span class="dot dot-red"></span> 2. AI போலி மேற்கோள்
+        </button>
+        <button type="button" class="judge-btn" id="scenarioAltered">
+          <span class="dot dot-amber"></span> 3. சொல் மாற்றம் & Diff
+        </button>
+        <button type="button" class="judge-btn" id="scenarioWitness">
+          <span class="dot dot-purple"></span> 4. இரு பதிப்பு ஒப்பீடு
+        </button>
+      </div>
+    </section>
+
+    <!-- Navigation Tabs -->
+    <nav class="tabs" aria-label="முதன்மைப் பிரிவுகள்">
+      <button class="tab active" data-view="gate">🛡️ AI தடுப்பு வாயில் (Guardrail)</button>
+      <button class="tab" data-view="verify">🔍 மேற்கோள் ஆய்வகம்</button>
+      <button class="tab" data-view="forge">✏️ நேரடி மாற்றச் சோதனை</button>
+      <button class="tab" data-view="api">⚡ Developer API</button>
+    </nav>
+
+    <!-- VIEW 1: AI Guardrail (Priority #1) -->
+    <section class="view active" id="view-gate">
+      <div class="section-heading">
+        <h2>AI பதில் வரைவுச் சான்றாய்வு</h2>
+        <span class="step-badge">Zero-Hallucination Gate</span>
+      </div>
+      <div class="work-grid">
+        <form class="panel input-panel" id="gateForm">
+          <div class="input-header">
+            <label for="draftInput">AI வழங்கிய பதில் வரைவு</label>
+            <div class="sample-pills">
+              <span>மாதிரிகள்:</span>
+              <button type="button" class="pill-btn" id="pillAiValid">உண்மைப் பதில்</button>
+              <button type="button" class="pill-btn pill-btn-danger" id="pillAiFake">போலி மேற்கோள்</button>
+            </div>
+          </div>
+          <textarea id="draftInput" rows="7" placeholder="மேற்கோள் உள்ள AI பதிலை இங்கே ஒட்டுங்கள்…" required></textarea>
+          <div class="manual-quote-box">
+            <label for="gateQuote">தனியாகச் சரிபார்க்க வேண்டிய மேற்கோள் <span class="muted">(விரும்பினால் மட்டும்)</span></label>
+            <input id="gateQuote" placeholder="தானாகக் கண்டறியத் தவறினால் மட்டும் உள்ளிடவும்" />
+          </div>
+          <div class="button-row">
+            <button class="primary-button" type="submit">வரைவைச் சரிபார் <span aria-hidden="true">↗</span></button>
+            <button class="text-button" id="clearGate" type="button">அழி</button>
+          </div>
+        </form>
+        <div class="panel result-panel" id="gateResult" aria-live="polite">
+          <div class="empty-state">
+            <div class="empty-icon">🛡️</div>
+            <h3>சான்றாய்வு முடிவுகள்</h3>
+            <p>AI பதிலிலுள்ள மேற்கோள்கள் தானாகப் பிரித்தெடுக்கப்பட்டு, மூலத்துடன் ஒப்பிட்டு அனுமதிக்கப்படும் அல்லது தடுக்கப்படும்.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 2: Verify Lab -->
+    <section class="view" id="view-verify" hidden>
+      <div class="section-heading">
+        <h2>மேற்கோள் ஆய்வு & பதிப்புச் சான்று</h2>
+        <span class="step-badge">Multi-Witness Engine</span>
+      </div>
+      <div class="work-grid">
+        <form class="panel input-panel" id="verifyForm">
+          <label for="quoteInput">சரிபார்க்க வேண்டிய தமிழ் மேற்கோள்</label>
+          <textarea id="quoteInput" rows="4" placeholder="திருக்குறள் வரியை இங்கே ஒட்டுங்கள்…" required></textarea>
+          <div class="field-row">
+            <div>
+              <label for="claimedWork">கூறப்படும் நூல்</label>
+              <input id="claimedWork" value="திருக்குறள்" />
+            </div>
+            <div>
+              <label for="claimedAuthor">கூறப்படும் ஆசிரியர்</label>
+              <input id="claimedAuthor" value="திருவள்ளுவர்" />
+            </div>
+          </div>
+          <div class="field-row number-row">
+            <div>
+              <label for="claimedNumber">கூறப்படும் எண்</label>
+              <input id="claimedNumber" type="number" min="1" max="1330" placeholder="எ.கா. 1" />
+            </div>
+            <button class="secondary-button" id="lookupNumber" type="button">எண் மூலம் தேடு</button>
+          </div>
+          <div class="button-row">
+            <button class="primary-button" type="submit">மூலத்துடன் சரிபார் <span aria-hidden="true">↗</span></button>
+            <button class="text-button" type="button" id="sampleQuote">மாதிரி</button>
+            <button class="text-button" type="button" id="clearQuote">அழி</button>
+          </div>
+        </form>
+        <div class="panel result-panel" id="verifyResult" aria-live="polite">
+          <div class="empty-state">
+            <div class="empty-icon">✓</div>
+            <h3>முடிவுக்காகக் காத்திருக்கிறது</h3>
+            <p>மேற்கோளை உள்ளிட்டதும் வரலாற்றுப் பதிப்புச் சான்று மற்றும் ஒப்பீடு இங்கே தோன்றும்.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 3: Forge & Diff -->
+    <section class="view" id="view-forge" hidden>
+      <div class="section-heading">
+        <h2>நேரடி மாற்றச் சோதனை (Adversarial Testing)</h2>
+        <span class="step-badge">Word-Level Diff</span>
+      </div>
+      <div class="panel forge-controls">
+        <label for="verseNumber">குறள் எண்</label>
+        <input id="verseNumber" type="number" min="1" max="1330" value="1">
+        <button class="secondary-button" id="loadVerse" type="button">ஏற்று</button>
+        <span id="forgeSourceNote" class="muted"></span>
+      </div>
+      <div class="work-grid">
+        <div class="panel input-panel">
+          <label for="forgeInput">உரை மாற்றம் செய்து சோதிக்கவும்</label>
+          <textarea id="forgeInput" rows="5" placeholder="மூலக் குறளை ஏற்றி ஏதேனும் ஒரு சொல்லை மாற்றுங்கள்…"></textarea>
+          <div class="button-row">
+            <button class="primary-button" id="forgeCheck" type="button">மாற்றத்தைச் சோதி <span aria-hidden="true">↗</span></button>
+            <button class="text-button" id="clearForge" type="button">அழி</button>
+          </div>
+        </div>
+        <div class="panel result-panel" id="forgeResult" aria-live="polite">
+          <div class="empty-state">
+            <div class="empty-icon">✎</div>
+            <h3>மாற்றச் சோதனை</h3>
+            <p>சொற்களை மாற்றியமைத்து ஒப்பீட்டு வேறுபாட்டைக் காண்க.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 4: Developer API Integration -->
+    <section class="view" id="view-api" hidden>
+      <div class="section-heading">
+        <h2>Developer API & Middleware Integration</h2>
+        <span class="step-badge">REST · Python · LangChain</span>
+      </div>
+      <div class="panel api-panel">
+        <p class="api-lead">எந்தவொரு தமிழ் AI செயலி அல்லது RAG கட்டமைப்பிலும் மெய்ப்பொருளை 2 வரிகளில் இணைக்கலாம்:</p>
+        
+        <div class="code-block">
+          <div class="code-title">Python / LangChain Guardrail Example</div>
+          <pre><code>import requests
+
+def verify_tamil_citation(ai_draft: str) -> dict:
+    response = requests.post(
+        "http://localhost:5173/api/gate",
+        json={"draft": ai_draft}
+    )
+    data = response.json()
+    if not data.get("approved"):
+        # AI பதில் தடுத்து நிறுத்தப்படுகிறது (Zero Hallucination)
+        raise ValueError(f"உண்மைத்தன்மை உறுதிப்படுத்தப்படவில்லை: {data['results']}")
+    return data</code></pre>
+        </div>
+
+        <div class="code-block">
+          <div class="code-title">cURL API Request</div>
+          <pre><code>curl -X POST http://localhost:5173/api/verify \
+  -H "Content-Type: application/json" \
+  -d '{"text": "அகர முதல எழுத்தெல்லாம் ஆதி பகவன் முதற்றே உலகு"}'</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <span>மெய்ப்பொருள் · தமிழ் இலக்கிய உண்மைத்தன்மை பாதுகாப்பு வாயில்</span>
+      <span id="footerSource">மூலத் தரவு: Project Madurai Unicode 2000 & Community Open JSON</span>
+    </footer>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>

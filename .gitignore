@@ -1,0 +1,6 @@
+data/meypporul.sqlite3
+data/meypporul.sqlite3-shm
+data/meypporul.sqlite3-wal
+__pycache__/
+backend/__pycache__/
+tests/__pycache__/
