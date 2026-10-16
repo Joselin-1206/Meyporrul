@@ -31,6 +31,63 @@ body {
 }
 button, input, textarea { font: inherit; }
 button { cursor: pointer; }
+[hidden] { display: none !important; }
+
+/* Account access */
+.auth-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: linear-gradient(135deg, rgba(18, 44, 32, .97), rgba(28, 75, 53, .92));
+}
+.auth-card {
+  width: min(100%, 420px);
+  padding: 34px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--card);
+  box-shadow: var(--shadow-lg);
+}
+.auth-mark { width: 56px; height: 56px; margin-bottom: 16px; border-radius: 50%; }
+.auth-mark svg { width: 30px; height: 30px; fill: currentColor; }
+.account-shortcut { display: inline-grid; place-items: center; padding: 0; border: 0; color: #fff; }
+.account-shortcut svg { width: 27px; height: 27px; fill: currentColor; }
+.account-shortcut:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
+.profile-wrap { position: relative; flex: 0 0 auto; }
+.profile-menu {
+  position: absolute; z-index: 30; top: calc(100% + 10px); left: 0; width: 210px;
+  display: grid; gap: 9px; padding: 14px; border: 1px solid var(--line); border-radius: 12px;
+  background: var(--card); box-shadow: var(--shadow-lg);
+}
+.profile-menu[hidden] { display: none; }
+.profile-menu-title { color: var(--muted); font-size: 12px; font-weight: 700; }
+.profile-menu .logout-button { justify-self: start; }
+.auth-card h1 { margin: 0; font: 700 28px 'Noto Serif Tamil', serif; }
+.auth-card > p:not(.auth-error) { margin: 8px 0 22px; color: var(--muted); font-size: 13px; }
+.auth-card label { display: block; margin: 14px 0 6px; font-size: 13px; font-weight: 700; }
+.auth-card input, .browse-controls input, .browse-controls select {
+  width: 100%; min-height: 42px; padding: 9px 12px; border: 1px solid var(--line-strong);
+  border-radius: 8px; background: #fff; color: var(--ink); outline: none;
+}
+.auth-card input:focus, .browse-controls input:focus, .browse-controls select:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(28,75,53,.12); }
+.password-field { position: relative; }
+.password-field input { padding-inline-end: 82px; }
+.password-toggle {
+  position: absolute; inset-inline-end: 8px; top: 50%; transform: translateY(-50%);
+  display: inline-flex; align-items: center; gap: 5px; min-height: 32px; padding: 4px 7px;
+  border: 0; border-radius: 6px; background: transparent; color: var(--green);
+  font-size: 12px; font-weight: 700;
+}
+.password-toggle:hover, .password-toggle:focus-visible { background: var(--softgreen); outline: 2px solid transparent; }
+.auth-submit { width: 100%; justify-content: center; margin-top: 12px; }
+.auth-switch { width: 100%; margin-top: 8px; }
+.auth-error { min-height: 20px; margin: 8px 0 0; color: var(--red); font-size: 12px; }
+.topbar-right { display: flex; align-items: center; gap: 12px; }
+.user-label { color: var(--green); font-size: 12px; font-weight: 700; }
+.logout-button { white-space: nowrap; }
 
 /* Topbar */
 .topbar {
@@ -49,6 +106,7 @@ button { cursor: pointer; }
   text-decoration: none;
   color: inherit;
 }
+.brand-title { display: flex; align-items: center; color: inherit; text-decoration: none; }
 .brand-mark {
   width: 44px;
   height: 44px;
@@ -358,6 +416,14 @@ main {
   gap: 12px;
   margin: 14px 0;
 }
+.live-hint {
+  margin-top: 9px; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--line);
+  background: var(--card-subtle); color: var(--muted); font-size: 12px;
+}
+.live-hint.is-good { border-color: #bddbc9; background: var(--softgreen); color: var(--green); }
+.live-hint.is-warn { border-color: #edd5a8; background: var(--softgold); color: #875411; }
+.live-hint.is-bad { border-color: #f2bdb5; background: var(--softred); color: var(--red); }
+.live-hint button { margin-left: 8px; padding: 5px 9px; border: 0; border-radius: 6px; background: var(--green); color: white; font-weight: 700; }
 .field-row label { font-size: 12px; }
 .field-row input { height: 42px; }
 .number-row {
@@ -457,6 +523,23 @@ main {
 .forge-controls label { margin: 0 0 6px; }
 .forge-controls input { width: 110px; height: 42px; }
 .forge-controls .secondary-button { height: 42px; }
+
+/* Browse by the three traditional Paal divisions */
+.paal-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px; }
+.paal-card { padding: 16px; text-align: left; border: 1px solid var(--line); border-radius: 12px; background: var(--card); color: var(--ink); box-shadow: var(--shadow); }
+.paal-card strong { display: block; color: var(--green); font: 700 18px 'Noto Serif Tamil', serif; }
+.paal-card span { display: block; margin-top: 5px; color: var(--muted); font-size: 12px; }
+.paal-card[aria-pressed="true"] { border-color: var(--green); background: var(--softgreen); box-shadow: inset 0 0 0 1px var(--green); }
+.browse-controls { display: grid; grid-template-columns: auto minmax(180px, 1fr) auto minmax(220px, 1.3fr); align-items: center; gap: 10px; padding: 14px; margin-bottom: 14px; }
+.browse-controls label { font-size: 12px; font-weight: 700; }
+.kural-list { display: grid; gap: 10px; }
+.kural-card { padding: 16px 18px; border: 1px solid var(--line); border-radius: 12px; background: var(--card); box-shadow: var(--shadow); }
+.kural-card-head { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; color: var(--muted); font-size: 12px; }
+.kural-card-head strong { color: var(--green); font-size: 14px; }
+.kural-card .verse-text { margin: 10px 0; }
+.kural-card .meaning-text { margin-top: 8px; }
+.kural-card-actions { display: flex; justify-content: flex-end; margin-top: 10px; }
+.browse-more { display: block; margin: 16px auto 0; }
 
 /* Result Details */
 .result-head {
@@ -664,4 +747,8 @@ footer {
   .meta-grid { grid-template-columns: 1fr 1fr; }
   .tabs { overflow-x: auto; }
   .tab { white-space: nowrap; }
+  .paal-cards { grid-template-columns: 1fr; }
+  .browse-controls { grid-template-columns: 1fr; }
+  .topbar { padding-inline: 14px; }
+  .user-label { display: none; }
 }

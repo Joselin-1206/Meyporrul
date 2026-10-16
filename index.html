@@ -11,14 +11,47 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <section class="auth-screen" id="authScreen" aria-labelledby="authTitle">
+    <form class="auth-card" id="authForm">
+      <div class="brand-mark auth-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M12 12a4.2 4.2 0 1 0 0-8.4 4.2 4.2 0 0 0 0 8.4Zm0 2c-4.35 0-7.5 2.2-7.5 5.2V21h15v-1.8c0-3-3.15-5.2-7.5-5.2Z"/></svg>
+      </div>
+      <h1 id="authTitle">மெய்ப்பொருள்</h1>
+      <p id="authHint">உங்கள் கணக்கில் நுழைந்து குறள்களைப் பயன்படுத்துங்கள்.</p>
+      <label for="authUsername">பயனர் பெயர்</label>
+      <input id="authUsername" name="username" autocomplete="username" lang="en" placeholder="Enter your username" required minlength="3" maxlength="32" aria-describedby="authMessage">
+      <label for="authPassword">கடவுச்சொல்</label>
+      <div class="password-field">
+        <input id="authPassword" name="password" type="password" autocomplete="current-password" lang="en" placeholder="Enter your password" required minlength="8" aria-describedby="authMessage">
+        <button class="password-toggle" id="passwordVisibilityToggle" type="button" aria-controls="authPassword" aria-pressed="false">
+          <span aria-hidden="true">◉</span><span id="passwordVisibilityLabel">காட்டு</span>
+        </button>
+      </div>
+      <p class="auth-error" id="authMessage" role="alert"></p>
+      <button class="primary-button auth-submit" id="authSubmit" type="submit">நுழைக</button>
+      <button class="text-button auth-switch" id="authSwitch" type="button">புதிய கணக்கு உருவாக்கு</button>
+    </form>
+  </section>
+  <div id="appShell" hidden>
   <header class="topbar">
-    <a class="brand" href="#முகப்பு" aria-label="மெய்ப்பொருள் முகப்பு">
-      <span class="brand-mark" aria-hidden="true">மெ</span>
+    <div class="brand">
+      <div class="profile-wrap">
+        <button class="brand-mark account-shortcut" id="profileButton" type="button" aria-label="பயனர் சுயவிவரம்" title="பயனர் சுயவிவரம்" aria-expanded="false" aria-controls="profileMenu">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12a4.2 4.2 0 1 0 0-8.4 4.2 4.2 0 0 0 0 8.4Zm0 2c-4.35 0-7.5 2.2-7.5 5.2V21h15v-1.8c0-3-3.15-5.2-7.5-5.2Z"/></svg>
+        </button>
+        <div class="profile-menu" id="profileMenu" hidden>
+          <span class="profile-menu-title">உங்கள் கணக்கு</span>
+          <span class="user-label" id="userLabel"></span>
+          <button type="button" class="text-button logout-button" id="logoutButton">வெளியேறு</button>
+        </div>
+      </div>
+      <a class="brand-title" href="#முகப்பு" aria-label="மெய்ப்பொருள் முகப்பு">
       <span>
         <strong>மெய்ப்பொருள்</strong>
         <small>AI உரைத் தடுப்பு வாயில் · பல பதிப்பு மூலச்சான்று</small>
       </span>
-    </a>
+      </a>
+    </div>
     <div class="topbar-right">
       <div class="source-status" id="sourceStatus" role="status">1330 குறள்கள் · SQLite தயார்</div>
     </div>
@@ -62,6 +95,7 @@
       <button class="tab active" data-view="gate">🛡️ AI தடுப்பு வாயில் (Guardrail)</button>
       <button class="tab" data-view="verify">🔍 மேற்கோள் ஆய்வகம்</button>
       <button class="tab" data-view="forge">✏️ நேரடி மாற்றச் சோதனை</button>
+      <button class="tab" data-view="browse">📚 பால் வாரியாகக் குறள்கள்</button>
       <button class="tab" data-view="api">⚡ Developer API</button>
     </nav>
 
@@ -111,6 +145,7 @@
         <form class="panel input-panel" id="verifyForm">
           <label for="quoteInput">சரிபார்க்க வேண்டிய தமிழ் மேற்கோள்</label>
           <textarea id="quoteInput" rows="4" placeholder="திருக்குறள் வரியை இங்கே ஒட்டுங்கள்…" required></textarea>
+          <div class="live-hint" id="liveHint" aria-live="polite" hidden></div>
           <div class="field-row">
             <div>
               <label for="claimedWork">கூறப்படும் நூல்</label>
@@ -142,6 +177,23 @@
           </div>
         </div>
       </div>
+    </section>
+
+    <!-- VIEW 4: Browse by Paal -->
+    <section class="view" id="view-browse" hidden>
+      <div class="section-heading">
+        <h2>திருக்குறள் — பால் வாரியான உலாவல்</h2>
+        <span class="step-badge" id="browseCount">1330 குறள்கள்</span>
+      </div>
+      <div class="paal-cards" id="paalCards" role="group" aria-label="பால் வகையைத் தேர்ந்தெடுக்கவும்"></div>
+      <div class="browse-controls panel">
+        <label for="chapterFilter">அதிகாரம்</label>
+        <select id="chapterFilter"><option value="">அனைத்து அதிகாரங்களும்</option></select>
+        <label for="browseSearch">குறள் / அதிகாரம் தேடல்</label>
+        <input id="browseSearch" type="search" placeholder="சொல் அல்லது குறள் எண்ணை உள்ளிடுங்கள்">
+      </div>
+      <div class="kural-list" id="kuralList" aria-live="polite"></div>
+      <button class="secondary-button browse-more" id="browseMore" type="button" hidden>மேலும் குறள்களைக் காட்டு</button>
     </section>
 
     <!-- VIEW 3: Forge & Diff -->
@@ -214,6 +266,7 @@ def verify_tamil_citation(ai_draft: str) -> dict:
       <span id="footerSource">மூலத் தரவு: Project Madurai Unicode 2000 & Community Open JSON</span>
     </footer>
   </main>
+  </div>
   <script src="app.js"></script>
 </body>
 </html>

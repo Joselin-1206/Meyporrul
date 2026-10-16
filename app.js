@@ -2,6 +2,11 @@ const REPOSITORY = 'https://github.com/tk120404/thirukkural';
 const API = '/api';
 let corpus = [];
 let witnessWidgetCount = 0;
+let authMode = 'login';
+let activePaal = 'அறத்துப்பால்';
+let browseLimit = 30;
+let liveTimer = null;
+let liveRequestId = 0;
 const $ = (id) => document.getElementById(id);
 
 function formattingNotes(input, original) {
@@ -47,6 +52,7 @@ async function loadCorpus() {
     const entries = await response.json();
     corpus = entries.map(normalizeEntry).filter((item) => Number.isInteger(item.number) && item.couplet).sort((a,b) => a.number - b.number);
     status.textContent = `${corpus.length} குறள்கள் · SQLite தயார்`;
+    renderPaalCards();
   } catch (error) {
     status.textContent = 'மூலத் தரவு பிழை';
     $('verifyResult').innerHTML = emptyState('!', 'சேவை அணுக முடியவில்லை', error.message);
@@ -247,6 +253,212 @@ document.querySelectorAll('.tab').forEach(button => {
   button.addEventListener('click', () => switchTab(button.dataset.view));
 });
 
+function showAuthenticatedApp(username) {
+  $('authScreen').hidden = true;
+  $('appShell').hidden = false;
+  $('userLabel').textContent = username;
+  $('profileMenu').hidden = true;
+  $('profileButton').setAttribute('aria-expanded', 'false');
+  loadCorpus();
+}
+
+function showAuthentication(message = '') {
+  $('appShell').hidden = true;
+  $('authScreen').hidden = false;
+  $('authMessage').textContent = message;
+  $('authPassword').value = '';
+  $('authPassword').type = 'password';
+  $('passwordVisibilityToggle').setAttribute('aria-pressed', 'false');
+  $('passwordVisibilityLabel').textContent = 'காட்டு';
+  authMode = 'login';
+  $('authTitle').textContent = 'மெய்ப்பொருள்';
+  $('authHint').textContent = 'உங்கள் கணக்கில் நுழைந்து குறள்களைப் பயன்படுத்துங்கள்.';
+  $('authSubmit').textContent = 'நுழைக';
+  $('authSwitch').textContent = 'புதிய கணக்கு உருவாக்கு';
+  $('authPassword').autocomplete = 'current-password';
+}
+
+$('passwordVisibilityToggle').addEventListener('click', () => {
+  const password = $('authPassword');
+  const visible = password.type === 'password';
+  password.type = visible ? 'text' : 'password';
+  $('passwordVisibilityToggle').setAttribute('aria-pressed', String(visible));
+  $('passwordVisibilityLabel').textContent = visible ? 'மறை' : 'காட்டு';
+});
+
+for (const field of [$('authUsername'), $('authPassword')]) {
+  field.addEventListener('invalid', () => {
+    if (field.validity.valueMissing) field.setCustomValidity(field === $('authUsername') ? 'பயனர் பெயரை உள்ளிடவும்.' : 'கடவுச்சொல்லை உள்ளிடவும்.');
+    else if (field === $('authUsername') && field.validity.tooShort) field.setCustomValidity('பயனர் பெயர் குறைந்தது 3 எழுத்துகள் கொண்டிருக்க வேண்டும்.');
+    else if (field === $('authPassword') && field.validity.tooShort) field.setCustomValidity('கடவுச்சொல் குறைந்தது 8 எழுத்துகள் கொண்டிருக்க வேண்டும்.');
+  });
+  field.addEventListener('input', () => field.setCustomValidity(''));
+}
+
+async function initializeAuthentication() {
+  try {
+    const response = await fetch(`${API}/auth/session`, { credentials: 'same-origin' });
+    const session = await response.json();
+    if (session.authenticated) showAuthenticatedApp(session.username);
+    else showAuthentication();
+  } catch {
+    showAuthentication('சேவையுடன் இணைக்க முடியவில்லை. வழங்கி இயங்குகிறதா எனச் சரிபார்க்கவும்.');
+  }
+}
+
+$('authSwitch').addEventListener('click', () => {
+  authMode = authMode === 'login' ? 'register' : 'login';
+  const registering = authMode === 'register';
+  $('authTitle').textContent = registering ? 'புதிய கணக்கு' : 'மெய்ப்பொருள்';
+  $('authHint').textContent = registering ? 'உங்கள் கணக்கை உருவாக்கி குறள் ஆய்வைத் தொடங்குங்கள்.' : 'உங்கள் கணக்கில் நுழைந்து குறள்களைப் பயன்படுத்துங்கள்.';
+  $('authSubmit').textContent = registering ? 'கணக்கை உருவாக்கு' : 'நுழைக';
+  $('authSwitch').textContent = registering ? 'ஏற்கெனவே கணக்கு உள்ளதா? நுழைக' : 'புதிய கணக்கு உருவாக்கு';
+  $('authPassword').autocomplete = registering ? 'new-password' : 'current-password';
+  $('authMessage').textContent = '';
+});
+
+$('authForm').addEventListener('submit', async (event) => {
+  event.preventDefault();
+  const submit = $('authSubmit');
+  submit.disabled = true;
+  $('authMessage').textContent = '';
+  try {
+    const response = await fetch(`${API}/auth/${authMode}`, {
+      method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username: $('authUsername').value.trim(), password: $('authPassword').value })
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || 'உள்நுழைய முடியவில்லை. விவரங்களைச் சரிபார்த்து மீண்டும் முயற்சிக்கவும்.');
+    showAuthenticatedApp(data.username);
+  } catch (error) {
+    $('authMessage').textContent = error instanceof TypeError
+      ? 'சேவையுடன் இணைக்க முடியவில்லை. இணைய இணைப்பைச் சரிபார்த்து மீண்டும் முயற்சிக்கவும்.'
+      : error.message;
+  } finally {
+    submit.disabled = false;
+  }
+});
+
+$('logoutButton').addEventListener('click', async () => {
+  try { await fetch(`${API}/auth/logout`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' }); }
+  finally { showAuthentication(); }
+});
+
+$('profileButton').addEventListener('click', () => {
+  const opening = $('profileMenu').hidden;
+  $('profileMenu').hidden = !opening;
+  $('profileButton').setAttribute('aria-expanded', String(opening));
+});
+document.addEventListener('click', (event) => {
+  if (!event.target.closest('.profile-wrap')) {
+    $('profileMenu').hidden = true;
+    $('profileButton').setAttribute('aria-expanded', 'false');
+  }
+});
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape') {
+    $('profileMenu').hidden = true;
+    $('profileButton').setAttribute('aria-expanded', 'false');
+  }
+});
+
+function renderPaalCards() {
+  const sections = ['அறத்துப்பால்', 'பொருட்பால்', 'காமத்துப்பால்'];
+  $('paalCards').innerHTML = sections.map(section => {
+    const count = corpus.filter(item => item.section === section).length;
+    return `<button type="button" class="paal-card" data-paal="${escapeHtml(section)}" aria-pressed="${activePaal === section}"><strong>${escapeHtml(section)}</strong><span>${count} குறள்கள்</span></button>`;
+  }).join('');
+  updateChapterFilter();
+  renderKuralList();
+}
+
+function updateChapterFilter() {
+  const selected = $('chapterFilter').value;
+  const chapters = [...new Set(corpus.filter(item => item.section === activePaal).map(item => item.chapter).filter(Boolean))];
+  $('chapterFilter').innerHTML = '<option value="">அனைத்து அதிகாரங்களும்</option>' + chapters.map(chapter => `<option value="${escapeHtml(chapter)}">${escapeHtml(chapter)}</option>`).join('');
+  if (chapters.includes(selected)) $('chapterFilter').value = selected;
+}
+
+function renderKuralList() {
+  const query = $('browseSearch').value.trim().toLocaleLowerCase('ta');
+  const chapter = $('chapterFilter').value;
+  const filtered = corpus.filter(item => item.section === activePaal && (!chapter || item.chapter === chapter) &&
+    (!query || String(item.number).includes(query) || item.chapter.toLocaleLowerCase('ta').includes(query) || item.couplet.toLocaleLowerCase('ta').includes(query)));
+  $('browseCount').textContent = `${filtered.length} குறள்கள்`;
+  const visible = filtered.slice(0, browseLimit);
+  $('kuralList').innerHTML = visible.length ? visible.map(item => `
+    <article class="kural-card">
+      <div class="kural-card-head"><strong>குறள் ${item.number}</strong><span>${escapeHtml(item.chapter || '')}</span></div>
+      <p class="verse-text">${escapeHtml(item.couplet)}</p>
+      ${item.meaning ? `<p class="meaning-text">${escapeHtml(item.meaning)}</p>` : ''}
+      <div class="kural-card-actions"><button type="button" class="secondary-button" data-open-kural="${item.number}">முழுமையாகப் பார்</button></div>
+    </article>`).join('') : emptyState('?', 'குறள் இல்லை', 'வேறு சொல்லையோ அதிகாரத்தையோ தேடிப் பாருங்கள்.');
+  $('browseMore').hidden = visible.length >= filtered.length;
+}
+
+$('paalCards').addEventListener('click', (event) => {
+  const button = event.target.closest('[data-paal]');
+  if (!button) return;
+  activePaal = button.dataset.paal;
+  browseLimit = 30;
+  $('browseSearch').value = '';
+  updateChapterFilter();
+  renderPaalCards();
+});
+$('chapterFilter').addEventListener('change', () => { browseLimit = 30; renderKuralList(); });
+$('browseSearch').addEventListener('input', () => { browseLimit = 30; renderKuralList(); });
+$('browseMore').addEventListener('click', () => { browseLimit += 30; renderKuralList(); });
+$('kuralList').addEventListener('click', (event) => {
+  const button = event.target.closest('[data-open-kural]');
+  if (!button) return;
+  const item = corpus.find(row => row.number === Number(button.dataset.openKural));
+  if (!item) return;
+  $('quoteInput').value = item.couplet;
+  $('claimedNumber').value = item.number;
+  $('liveHint').hidden = true;
+  switchTab('verify');
+  $('verifyForm').dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+});
+
+function paintLiveHint(message, kind = '', suggestion = '') {
+  const hint = $('liveHint');
+  hint.hidden = false;
+  hint.className = `live-hint${kind ? ` is-${kind}` : ''}`;
+  hint.innerHTML = `${escapeHtml(message)}${suggestion ? ` <button type="button" data-use-suggestion="${escapeHtml(suggestion)}">மூலக் குறளைப் பயன்படுத்து</button>` : ''}`;
+}
+
+$('quoteInput').addEventListener('input', () => {
+  clearTimeout(liveTimer);
+  const requestId = ++liveRequestId;
+  const input = $('quoteInput').value.trim();
+  if (!input) { $('liveHint').hidden = true; return; }
+  const tamilLength = (input.match(/[\u0B80-\u0BFF]/gu) || []).length;
+  if (tamilLength < 8) { paintLiveHint('மேற்கோளைத் தொடர்ந்து தட்டச்சிடுங்கள்; பின்னர் பிழையைச் சோதிக்கிறோம்.'); return; }
+  paintLiveHint('தட்டச்சு செய்த உரையை மூலக் குறள்களுடன் ஒப்பிடுகிறது…');
+  liveTimer = setTimeout(async () => {
+    try {
+      const result = await postApi('/verify', { text: input });
+      if (requestId !== liveRequestId) return;
+      if (result.kind === 'exact') paintLiveHint(`குறள் ${result.item.number}: மூலத்துடன் சரியாகப் பொருந்துகிறது.`, 'good');
+      else if (result.kind === 'format') paintLiveHint(`குறள் ${result.item.number}: இடைவெளி அல்லது குறியீட்டு வேறுபாடு உள்ளது. மூல வடிவம் கீழே.`, 'warn', result.item.couplet);
+      else if (result.kind === 'partial') paintLiveHint(`குறள் ${result.item.number}: இது முழுக் குறளின் ஒரு பகுதி.`, 'warn', result.item.couplet);
+      else if (result.kind === 'altered') paintLiveHint(`குறள் ${result.item.number}-க்கு அருகிலான உரை. சொல்/எழுத்து மாற்றம் இருக்கலாம்; பரிந்துரை மட்டும்.`, 'warn', result.item.couplet);
+      else if (result.kind === 'insufficient') paintLiveHint('இன்னும் சில தமிழ் எழுத்துகளைத் தட்டச்சிடுங்கள்.');
+      else paintLiveHint('ஏற்றப்பட்ட திருக்குறள் தொகுப்பில் இதற்கான பொருத்தம் இல்லை.', 'bad');
+    } catch (error) {
+      if (requestId === liveRequestId) paintLiveHint(error.message, 'bad');
+    }
+  }, 350);
+});
+
+$('liveHint').addEventListener('click', (event) => {
+  const button = event.target.closest('[data-use-suggestion]');
+  if (!button) return;
+  $('quoteInput').value = button.dataset.useSuggestion;
+  $('liveHint').hidden = true;
+  $('verifyForm').dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+});
+
 // Tab 1: AI Gate Form
 $('gateForm').addEventListener('submit', async (event) => {
   event.preventDefault();
@@ -439,4 +651,4 @@ $('scenarioWitness').addEventListener('click', async () => {
   }
 });
 
-loadCorpus();
+initializeAuthentication();

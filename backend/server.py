@@ -2,14 +2,18 @@
 from __future__ import annotations
 
 import json
+import hashlib
+import hmac
 import os
 import re
+import secrets
 import sqlite3
+import time
 import unicodedata
 from contextlib import contextmanager
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
-from urllib.parse import urlparse
+from urllib.parse import parse_qs, urlparse
 
 ROOT = Path(__file__).resolve().parent.parent
 DATA = ROOT / "data" / "tirukkural.json"
@@ -17,6 +21,8 @@ DB = ROOT / "data" / "meypporul.sqlite3"
 COMMUNITY_EDITION = "community-json"
 LOCAL_PORT = 5173
 PUNCTUATION = re.compile(r"[“”‘’\"'.,;:!?()[\]{}…—–-]")
+SESSION_SECONDS = 60 * 60 * 24 * 7
+PASSWORD_ROUNDS = 240_000
 
 
 def normalize(text: str, loose: bool = False) -> str:
@@ -64,6 +70,14 @@ def initialize_database() -> int:
           number INTEGER NOT NULL, printed_number TEXT NOT NULL DEFAULT '', occurrence INTEGER NOT NULL DEFAULT 1, line1 TEXT NOT NULL,
           line2 TEXT NOT NULL, couplet TEXT NOT NULL, source_locator TEXT NOT NULL DEFAULT '',
           UNIQUE(edition_id, number, occurrence))""")
+        db.execute("""CREATE TABLE IF NOT EXISTS users (
+          id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT NOT NULL UNIQUE,
+          password_salt BLOB NOT NULL, password_hash BLOB NOT NULL,
+          created_at INTEGER NOT NULL)""")
+        db.execute("""CREATE TABLE IF NOT EXISTS auth_sessions (
+          token_hash TEXT PRIMARY KEY, user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+          expires_at INTEGER NOT NULL)""")
+        db.execute("CREATE INDEX IF NOT EXISTS idx_auth_sessions_expiry ON auth_sessions(expires_at)")
         # Existing local databases predate preservation of the source's printed label.
         verse_columns = {row[1] for row in db.execute("PRAGMA table_info(edition_verses)")}
         if "printed_number" not in verse_columns:
@@ -132,9 +146,17 @@ def witness_report(number: int) -> dict:
     return {"number": number, "primary": primary, "editions": list(grouped.values())}
 
 
-def all_kurals():
+def all_kurals(section: str = "", chapter: str = ""):
+    clauses, values = [], []
+    if section:
+        clauses.append("section=?")
+        values.append(section)
+    if chapter:
+        clauses.append("chapter=?")
+        values.append(chapter)
+    where = f" WHERE {' AND '.join(clauses)}" if clauses else ""
     with connect() as db:
-        return [dict(row) for row in db.execute("SELECT * FROM kurals ORDER BY number")]
+        return [dict(row) for row in db.execute("SELECT * FROM kurals" + where + " ORDER BY number", values)]
 
 
 def distance(a: str, b: str) -> int:
@@ -205,23 +227,33 @@ class Handler(SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=str(ROOT), **kwargs)
 
-    def send_json(self, value, status=200):
+    def send_json(self, value, status=200, headers=None):
         payload = json.dumps(value, ensure_ascii=False).encode("utf-8")
         self.send_response(status)
         self.send_header("Content-Type", "application/json; charset=utf-8")
         self.send_header("Content-Length", str(len(payload)))
         self.send_header("Cache-Control", "no-store")
+        for name, value in (headers or {}).items():
+            self.send_header(name, value)
         self.end_headers()
         self.wfile.write(payload)
 
     def do_GET(self):
         path = urlparse(self.path).path
+        if path == "/api/auth/session":
+            user = self.current_user()
+            return self.send_json({"authenticated": bool(user), "username": user["username"] if user else None})
         if path == "/api/health":
             with connect() as db:
                 count = db.execute("SELECT COUNT(*) FROM kurals").fetchone()[0]
             return self.send_json({"ok": True, "corpusCount": count, "database": "SQLite"})
+        if path.startswith("/api/") and not self.current_user():
+            return self.send_json({"error": "உள்நுழைந்த பிறகே இந்த வசதியைப் பயன்படுத்தலாம்."}, 401)
         if path == "/api/kurals":
-            return self.send_json(all_kurals())
+            query = parse_qs(urlparse(self.path).query)
+            section = query.get("section", [""])[0]
+            chapter = query.get("chapter", [""])[0]
+            return self.send_json(all_kurals(section=section, chapter=chapter))
         match = re.fullmatch(r"/api/witness/(\d+)", path)
         if match:
             result = witness_report(int(match.group(1)))
@@ -237,13 +269,50 @@ class Handler(SimpleHTTPRequestHandler):
 
     def do_POST(self):
         path = urlparse(self.path).path
-        if path not in ("/api/verify", "/api/gate"):
+        if path not in ("/api/auth/register", "/api/auth/login", "/api/auth/logout", "/api/verify", "/api/gate"):
             return self.send_json({"error": "Not found"}, 404)
         try:
             size = int(self.headers.get("Content-Length", "0"))
             if size < 1 or size > 100_000:
                 return self.send_json({"error": "Request must be between 1 and 100000 bytes"}, 400)
             body = json.loads(self.rfile.read(size))
+            if path == "/api/auth/register":
+                username = str(body.get("username", "")).strip()
+                password = str(body.get("password", ""))
+                valid_name = all(unicodedata.category(char)[0] in ("L", "M", "N") or char in "_.-" for char in username)
+                if not 3 <= len(username) <= 32 or not valid_name:
+                    return self.send_json({"error": "பயனர் பெயர் 3 முதல் 32 எழுத்துகள் வரை இருக்க வேண்டும்; ஆங்கிலம் அல்லது தமிழ் எழுத்துகள், எண்கள், _, ., - ஆகியவற்றைப் பயன்படுத்தலாம்."}, 400)
+                if len(password) < 8:
+                    return self.send_json({"error": "கடவுச்சொல் குறைந்தது 8 எழுத்துகள் கொண்டிருக்க வேண்டும்."}, 400)
+                salt = secrets.token_bytes(16)
+                digest = hashlib.pbkdf2_hmac("sha256", password.encode(), salt, PASSWORD_ROUNDS)
+                try:
+                    with connect() as db:
+                        cursor = db.execute("INSERT INTO users(username,password_salt,password_hash,created_at) VALUES(?,?,?,?)",
+                                            (username, salt, digest, int(time.time())))
+                        user_id = cursor.lastrowid
+                except sqlite3.IntegrityError:
+                    return self.send_json({"error": "இந்தப் பயனர் பெயர் ஏற்கெனவே பயன்படுத்தப்படுகிறது. வேறு பெயரைத் தேர்ந்தெடுக்கவும்."}, 409)
+                return self.create_session(user_id, username)
+            if path == "/api/auth/login":
+                username = str(body.get("username", "")).strip()
+                password = str(body.get("password", ""))
+                with connect() as db:
+                    user = db.execute("SELECT * FROM users WHERE username=?", (username,)).fetchone()
+                if not user:
+                    return self.send_json({"error": "பயனர் பெயர் அல்லது கடவுச்சொல் தவறாக உள்ளது. இரண்டையும் சரிபார்த்து மீண்டும் முயற்சிக்கவும்."}, 401)
+                digest = hashlib.pbkdf2_hmac("sha256", password.encode(), user["password_salt"], PASSWORD_ROUNDS)
+                if not hmac.compare_digest(digest, user["password_hash"]):
+                    return self.send_json({"error": "பயனர் பெயர் அல்லது கடவுச்சொல் தவறாக உள்ளது. இரண்டையும் சரிபார்த்து மீண்டும் முயற்சிக்கவும்."}, 401)
+                return self.create_session(user["id"], user["username"])
+            if path == "/api/auth/logout":
+                token = self.session_token()
+                if token:
+                    with connect() as db:
+                        db.execute("DELETE FROM auth_sessions WHERE token_hash=?", (hashlib.sha256(token.encode()).hexdigest(),))
+                return self.send_json({"ok": True}, headers={"Set-Cookie": self.session_cookie("", clear=True)})
+            if not self.current_user():
+                return self.send_json({"error": "உள்நுழைந்த பிறகே இந்த வசதியைப் பயன்படுத்தலாம்."}, 401)
             if path == "/api/verify":
                 text = body.get("text", "")
                 if not isinstance(text, str):
@@ -254,6 +323,38 @@ class Handler(SimpleHTTPRequestHandler):
             return self.send_json(evaluate_gate(draft, manual))
         except (ValueError, json.JSONDecodeError) as exc:
             return self.send_json({"error": str(exc)}, 400)
+
+    def session_token(self):
+        for part in self.headers.get("Cookie", "").split(";"):
+            name, _, value = part.strip().partition("=")
+            if name == "meypporul_session":
+                return value
+        return ""
+
+    def current_user(self):
+        token = self.session_token()
+        if not token:
+            return None
+        token_hash = hashlib.sha256(token.encode()).hexdigest()
+        with connect() as db:
+            db.execute("DELETE FROM auth_sessions WHERE expires_at < ?", (int(time.time()),))
+            row = db.execute("SELECT u.id,u.username FROM auth_sessions s JOIN users u ON u.id=s.user_id WHERE s.token_hash=? AND s.expires_at>=?",
+                             (token_hash, int(time.time()))).fetchone()
+        return row
+
+    def session_cookie(self, token, clear=False):
+        secure = "; Secure" if self.headers.get("X-Forwarded-Proto", "").lower() == "https" else ""
+        age = 0 if clear else SESSION_SECONDS
+        return f"meypporul_session={token}; Path=/; HttpOnly; SameSite=Lax; Max-Age={age}{secure}"
+
+    def create_session(self, user_id, username):
+        token = secrets.token_urlsafe(32)
+        digest = hashlib.sha256(token.encode()).hexdigest()
+        with connect() as db:
+            db.execute("DELETE FROM auth_sessions WHERE expires_at < ?", (int(time.time()),))
+            db.execute("INSERT INTO auth_sessions(token_hash,user_id,expires_at) VALUES(?,?,?)",
+                       (digest, user_id, int(time.time()) + SESSION_SECONDS))
+        return self.send_json({"authenticated": True, "username": username}, headers={"Set-Cookie": self.session_cookie(token)})
 
     def log_message(self, fmt, *args):
         print(f"{self.address_string()} - {fmt % args}")
