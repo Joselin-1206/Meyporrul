@@ -525,11 +525,18 @@ main {
 .forge-controls .secondary-button { height: 42px; }
 
 /* Browse by the three traditional Paal divisions */
-.paal-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px; }
-.paal-card { padding: 16px; text-align: left; border: 1px solid var(--line); border-radius: 12px; background: var(--card); color: var(--ink); box-shadow: var(--shadow); }
-.paal-card strong { display: block; color: var(--green); font: 700 18px 'Noto Serif Tamil', serif; }
-.paal-card span { display: block; margin-top: 5px; color: var(--muted); font-size: 12px; }
-.paal-card[aria-pressed="true"] { border-color: var(--green); background: var(--softgreen); box-shadow: inset 0 0 0 1px var(--green); }
+.paal-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-bottom: 18px; }
+.paal-card { min-height: 142px; padding: 20px; text-align: left; border: 1px solid var(--line); border-top: 4px solid var(--green); border-radius: 14px; background: var(--card); color: var(--ink); box-shadow: var(--shadow); transition: transform .16s ease, box-shadow .16s ease, background .16s ease; }
+.paal-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+.paal-card:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+.paal-card strong { display: block; color: var(--green); font: 700 20px 'Noto Serif Tamil', serif; }
+.paal-card span { display: block; margin-top: 8px; color: var(--ink); font-size: 13px; font-weight: 700; }
+.paal-card small { display: block; margin-top: 5px; color: var(--muted); font-size: 12px; }
+.paal-porul { border-top-color: #b37322; }
+.paal-porul strong { color: #875411; }
+.paal-kamam { border-top-color: #a33868; }
+.paal-kamam strong { color: #8e315c; }
+.paal-card[aria-pressed="true"] { background: var(--softgreen); box-shadow: inset 0 0 0 2px var(--green), var(--shadow); }
 .browse-controls { display: grid; grid-template-columns: auto minmax(180px, 1fr) auto minmax(220px, 1.3fr); align-items: center; gap: 10px; padding: 14px; margin-bottom: 14px; }
 .browse-controls label { font-size: 12px; font-weight: 700; }
 .kural-list { display: grid; gap: 10px; }

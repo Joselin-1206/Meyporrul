@@ -363,10 +363,15 @@ document.addEventListener('keydown', (event) => {
 });
 
 function renderPaalCards() {
-  const sections = ['அறத்துப்பால்', 'பொருட்பால்', 'காமத்துப்பால்'];
+  const sections = [
+    { name: 'அறத்துப்பால்', range: 'குறள் 1–380', description: 'அறம், ஒழுக்கம், இல்லறம்', tone: 'aram' },
+    { name: 'பொருட்பால்', range: 'குறள் 381–1080', description: 'ஆட்சி, நட்பு, குடிமை', tone: 'porul' },
+    { name: 'காமத்துப்பால்', range: 'குறள் 1081–1330', description: 'காதல் வாழ்வின் உணர்வுகள்', tone: 'kamam' }
+  ];
   $('paalCards').innerHTML = sections.map(section => {
-    const count = corpus.filter(item => item.section === section).length;
-    return `<button type="button" class="paal-card" data-paal="${escapeHtml(section)}" aria-pressed="${activePaal === section}"><strong>${escapeHtml(section)}</strong><span>${count} குறள்கள்</span></button>`;
+    const entries = corpus.filter(item => item.section === section.name);
+    const chapters = new Set(entries.map(item => item.chapter).filter(Boolean)).size;
+    return `<button type="button" class="paal-card paal-${section.tone}" data-paal="${escapeHtml(section.name)}" aria-pressed="${activePaal === section.name}"><strong>${escapeHtml(section.name)}</strong><span>${entries.length} குறள்கள் · ${chapters} அதிகாரங்கள்</span><small>${section.range} · ${section.description}</small></button>`;
   }).join('');
   updateChapterFilter();
   renderKuralList();
