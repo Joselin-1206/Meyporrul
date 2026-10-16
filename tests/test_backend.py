@@ -34,6 +34,23 @@ class VerificationTests(unittest.TestCase):
     def test_insufficient_evidence(self):
         self.assertEqual(server.verify("அறம்")["kind"], "insufficient")
 
+    def test_aathichudi_is_loaded_and_recognized_as_its_own_work(self):
+        items = server.all_aathichudi()
+        self.assertEqual(len(items), 109)
+        result = server.verify("அறம் செய விரும்பு")
+        self.assertEqual(result["kind"], "format")
+        self.assertEqual(result["work"], "ஆத்திச்சூடி")
+        self.assertEqual(result["item"]["number"], 1)
+        self.assertIn("projectmadurai", result["item"]["source"])
+
+    def test_public_api_rate_limit_window(self):
+        key = "test-client-public-api"
+        server._public_hits[key].clear()
+        for _ in range(server.PUBLIC_API_LIMIT):
+            self.assertTrue(server.public_api_allowed(key))
+        self.assertFalse(server.public_api_allowed(key))
+        server._public_hits[key].clear()
+
     def test_gate_does_not_approve_when_no_quote_was_detected(self):
         result = server.evaluate_gate("இந்த பதிலில் மேற்கோள் இல்லை.")
         self.assertFalse(result["approved"])

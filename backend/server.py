@@ -9,7 +9,9 @@ import re
 import secrets
 import sqlite3
 import time
+import threading
 import unicodedata
+from collections import defaultdict, deque
 from contextlib import contextmanager
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -17,12 +19,29 @@ from urllib.parse import parse_qs, urlparse
 
 ROOT = Path(__file__).resolve().parent.parent
 DATA = ROOT / "data" / "tirukkural.json"
+AATHICHUDI_DATA = ROOT / "data" / "aathichudi.json"
 DB = ROOT / "data" / "meypporul.sqlite3"
 COMMUNITY_EDITION = "community-json"
 LOCAL_PORT = 5173
 PUNCTUATION = re.compile(r"[“”‘’\"'.,;:!?()[\]{}…—–-]")
 SESSION_SECONDS = 60 * 60 * 24 * 7
 PASSWORD_ROUNDS = 240_000
+PUBLIC_API_LIMIT = 60
+PUBLIC_API_WINDOW = 60
+_public_hits = defaultdict(deque)
+_public_hits_lock = threading.Lock()
+
+
+def public_api_allowed(client_ip: str) -> bool:
+    now = time.monotonic()
+    with _public_hits_lock:
+        hits = _public_hits[client_ip]
+        while hits and now - hits[0] >= PUBLIC_API_WINDOW:
+            hits.popleft()
+        if len(hits) >= PUBLIC_API_LIMIT:
+            return False
+        hits.append(now)
+        return True
 
 
 def normalize(text: str, loose: bool = False) -> str:
@@ -89,6 +108,12 @@ def initialize_database() -> int:
               VALUES (:number,:line1,:line2,:couplet,:meaning,:chapter,:chapterNumber,:section,:sourceUrl)""",
               [{**item, "meaning": item.get("meaning", ""), "sourceUrl": item.get("sourceUrl", "")} for item in entries])
         db.execute("CREATE INDEX IF NOT EXISTS idx_kurals_chapter ON kurals(chapter_number)")
+        aathichudi = json.loads(AATHICHUDI_DATA.read_text(encoding="utf-8")) if AATHICHUDI_DATA.exists() else {"items": []}
+        db.execute("""CREATE TABLE IF NOT EXISTS aathichudi (
+          number INTEGER PRIMARY KEY, text TEXT NOT NULL, group_name TEXT NOT NULL DEFAULT '')""")
+        db.execute("DELETE FROM aathichudi")
+        db.executemany("INSERT INTO aathichudi(number,text,group_name) VALUES(?,?,?)",
+                       [(int(item["number"]), item["text"], item.get("group", "")) for item in aathichudi.get("items", [])])
         source_url = entries[0].get("sourceUrl", "https://github.com/tk120404/thirukkural")
         db.execute("""INSERT INTO editions(id,name,source_url,attribution,license_note)
           VALUES(?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET name=excluded.name,source_url=excluded.source_url,
@@ -108,6 +133,16 @@ def get_kural(number: int):
     with connect() as db:
         row = db.execute("SELECT * FROM kurals WHERE number=?", (number,)).fetchone()
     return dict(row) if row else None
+
+
+def all_aathichudi(query: str = ""):
+    with connect() as db:
+        rows = [dict(row) for row in db.execute("SELECT number,text,group_name FROM aathichudi ORDER BY number")]
+    if query:
+        needle = normalize(query, loose=True)
+        rows = [row for row in rows if needle in normalize(row["text"] + row["group_name"], loose=True)
+                or needle in str(row["number"])]
+    return rows
 
 
 def witness_report(number: int) -> dict:
@@ -179,6 +214,19 @@ def verify(text: str) -> dict:
     if tamil_count < 8:
         return {"kind": "insufficient", "item": None}
     strict, loose = normalize(text), normalize(text, True)
+    for row in all_aathichudi():
+        source = row["text"]
+        if strict == normalize(source):
+            kind = "exact" if unicodedata.normalize("NFC", text).strip() == unicodedata.normalize("NFC", source).strip() else "format"
+            return {"kind": kind, "work": "ஆத்திச்சூடி", "author": "ஔவையார் (மூலப் பதிவின் attribution)",
+                    "item": {"number": row["number"], "couplet": source, "chapter": row["group_name"],
+                             "meaning": "இந்த ஆத்திச்சூடி வரிக்கான விளக்கத்தை உறுதிப்படுத்திய மூலத் தரவில் சேர்க்கவில்லை.",
+                             "source": "https://www.projectmadurai.org/pm_etexts/utf8/pmuni0002.html"}}
+        if loose == normalize(source, True):
+            return {"kind": "format", "work": "ஆத்திச்சூடி", "author": "ஔவையார் (மூலப் பதிவின் attribution)",
+                    "item": {"number": row["number"], "couplet": source, "chapter": row["group_name"],
+                             "meaning": "இந்த ஆத்திச்சூடி வரிக்கான விளக்கத்தை உறுதிப்படுத்திய மூலத் தரவில் சேர்க்கவில்லை.",
+                             "source": "https://www.projectmadurai.org/pm_etexts/utf8/pmuni0002.html"}}
     records = all_kurals()
     for item in records:
         source = item["couplet"]
@@ -246,9 +294,17 @@ class Handler(SimpleHTTPRequestHandler):
         if path == "/api/health":
             with connect() as db:
                 count = db.execute("SELECT COUNT(*) FROM kurals").fetchone()[0]
-            return self.send_json({"ok": True, "corpusCount": count, "database": "SQLite"})
+                aathi_count = db.execute("SELECT COUNT(*) FROM aathichudi").fetchone()[0]
+            return self.send_json({"ok": True, "corpusCount": count, "aathichudiCount": aathi_count, "database": "SQLite"})
+        if path == "/api/works":
+            return self.send_json([{"id": "thirukkural", "name": "திருக்குறள்", "count": 1330},
+                                   {"id": "aathichudi", "name": "ஆத்திச்சூடி", "count": len(all_aathichudi()),
+                                    "source": "https://www.projectmadurai.org/pm_etexts/utf8/pmuni0002.html"}])
         if path.startswith("/api/") and not self.current_user():
             return self.send_json({"error": "உள்நுழைந்த பிறகே இந்த வசதியைப் பயன்படுத்தலாம்."}, 401)
+        if path == "/api/aathichudi":
+            query = parse_qs(urlparse(self.path).query).get("q", [""])[0]
+            return self.send_json(all_aathichudi(query))
         if path == "/api/kurals":
             query = parse_qs(urlparse(self.path).query)
             section = query.get("section", [""])[0]
@@ -267,9 +323,19 @@ class Handler(SimpleHTTPRequestHandler):
             return self.send_json(item)
         return super().do_GET()
 
+    def do_OPTIONS(self):
+        if urlparse(self.path).path != "/api/public/verify":
+            return self.send_error(404)
+        self.send_response(204)
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header("Access-Control-Allow-Methods", "POST, OPTIONS")
+        self.send_header("Access-Control-Allow-Headers", "Content-Type")
+        self.send_header("Access-Control-Max-Age", "600")
+        self.end_headers()
+
     def do_POST(self):
         path = urlparse(self.path).path
-        if path not in ("/api/auth/register", "/api/auth/login", "/api/auth/logout", "/api/verify", "/api/gate"):
+        if path not in ("/api/auth/register", "/api/auth/login", "/api/auth/logout", "/api/verify", "/api/gate", "/api/teacher/check", "/api/public/verify"):
             return self.send_json({"error": "Not found"}, 404)
         try:
             size = int(self.headers.get("Content-Length", "0"))
@@ -311,6 +377,15 @@ class Handler(SimpleHTTPRequestHandler):
                     with connect() as db:
                         db.execute("DELETE FROM auth_sessions WHERE token_hash=?", (hashlib.sha256(token.encode()).hexdigest(),))
                 return self.send_json({"ok": True}, headers={"Set-Cookie": self.session_cookie("", clear=True)})
+            if path == "/api/public/verify":
+                if not public_api_allowed(self.client_address[0]):
+                    return self.send_json({"error": "கோரிக்கை வரம்பு எட்டப்பட்டது; ஒரு நிமிடம் கழித்து முயற்சிக்கவும்."}, 429,
+                                          {"Access-Control-Allow-Origin": "*"})
+                text = body.get("text", "")
+                if not isinstance(text, str) or len(text) > 10_000:
+                    return self.send_json({"error": "text என்ற உரையை 10000 எழுத்துகளுக்குள் அனுப்பவும்."}, 400,
+                                          {"Access-Control-Allow-Origin": "*"})
+                return self.send_json(verify(text), headers={"Access-Control-Allow-Origin": "*"})
             if not self.current_user():
                 return self.send_json({"error": "உள்நுழைந்த பிறகே இந்த வசதியைப் பயன்படுத்தலாம்."}, 401)
             if path == "/api/verify":
@@ -318,6 +393,14 @@ class Handler(SimpleHTTPRequestHandler):
                 if not isinstance(text, str):
                     return self.send_json({"error": "text must be a string"}, 400)
                 return self.send_json(verify(text))
+            if path == "/api/teacher/check":
+                quotes = body.get("quotes", [])
+                if not isinstance(quotes, list) or not 1 <= len(quotes) <= 100 or any(not isinstance(q, str) for q in quotes):
+                    return self.send_json({"error": "1 முதல் 100 வரையிலான உரை வரிகளை அனுப்பவும்."}, 400)
+                results = [{"quote": quote, "result": verify(quote)} for quote in quotes if quote.strip()]
+                verified = sum(result["result"]["kind"] in ("exact", "format") for result in results)
+                return self.send_json({"total": len(results), "verified": verified,
+                                       "review": len(results) - verified, "results": results})
             draft = body.get("draft", "")
             manual = body.get("quote", "")
             return self.send_json(evaluate_gate(draft, manual))

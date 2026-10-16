@@ -5,6 +5,9 @@ let witnessWidgetCount = 0;
 let authMode = 'login';
 let activePaal = 'அறத்துப்பால்';
 let browseLimit = 30;
+let aathichudi = [];
+let learnRound = null;
+let learnScore = Number(localStorage.getItem('meypporul-learn-score') || 0);
 let liveTimer = null;
 let liveRequestId = 0;
 const $ = (id) => document.getElementById(id);
@@ -53,6 +56,7 @@ async function loadCorpus() {
     corpus = entries.map(normalizeEntry).filter((item) => Number.isInteger(item.number) && item.couplet).sort((a,b) => a.number - b.number);
     status.textContent = `${corpus.length} குறள்கள் · SQLite தயார்`;
     renderPaalCards();
+    await loadAathichudi();
   } catch (error) {
     status.textContent = 'மூலத் தரவு பிழை';
     $('verifyResult').innerHTML = emptyState('!', 'சேவை அணுக முடியவில்லை', error.message);
@@ -76,7 +80,7 @@ function verdict(kind) {
     format: ['வடிவ வேறுபாட்டுடன் பொருந்துகிறது', 'good', 'நிறுத்தக்குறி அல்லது இடைவெளி மட்டுமே வேறுபடுகிறது; பொருள் அசல்.'],
     partial: ['மூலத்தின் ஒரு பகுதி மட்டுமே', 'warn', 'உள்ளீடு முழுக் குறளல்ல; ஒரு வரி அல்லது பகுதி மட்டுமே.'],
     altered: ['சொல் மாற்றம் கண்டறியப்பட்டது', 'warn', 'அருகிலுள்ள மூலக் குறளில் சொல் அல்லது எழுத்து மாற்றப்பட்டுள்ளது.'],
-    'not-found': ['மூலத் தொகுப்பில் ஆதாரம் இல்லை', 'bad', 'திருக்குறள் தொகுப்பில் இந்த மேற்கோளுக்கான ஆதாரம் கிடைக்கவில்லை.'],
+    'not-found': ['தொகுப்பில் ஆதாரம் இல்லை', 'bad', 'இணைக்கப்பட்ட நூல் தொகுப்புகளில் இந்த மேற்கோளுக்கான ஆதாரம் கிடைக்கவில்லை.'],
     insufficient: ['போதிய நீளமில்லை', 'warn', 'சரிபார்க்க குறைந்தபட்சம் 8 தமிழ் எழுத்துகள் தேவை.']
   })[kind] || ['ஆய்வு செய்யப்படவில்லை', 'warn', ''];
 }
@@ -125,7 +129,7 @@ function resultMarkup(input, result, claim = {}) {
     <div class="result-head">
       <div>
         <span class="verdict ${cls}">${label}</span>
-        <h3>${result.item ? `குறள் ${result.item.number}` : 'ஆய்வு முடிவு'}</h3>
+        <h3>${result.item ? `${escapeHtml(result.work || 'திருக்குறள்')} ${result.item.number}` : 'ஆய்வு முடிவு'}</h3>
       </div>
     </div>
     <div class="result-section">
@@ -159,20 +163,24 @@ function resultMarkup(input, result, claim = {}) {
       <div class="result-section">
         <div class="meta-grid">
           <div class="meta-cell"><small>எண்</small><strong>${result.item.number}</strong></div>
-          <div class="meta-cell"><small>அதிகாரம்</small><strong>${escapeHtml(result.item.chapter || 'பொது')}</strong></div>
+          <div class="meta-cell"><small>${result.work === 'ஆத்திச்சூடி' ? 'எழுத்து வகை' : 'அதிகாரம்'}</small><strong>${escapeHtml(result.item.chapter || 'பொது')}</strong></div>
           <div class="meta-cell"><small>முடிவு</small><strong>${label}</strong></div>
-          <div class="meta-cell"><small>ஆதாரம்</small><strong>SQLite Corpus</strong></div>
+          <div class="meta-cell"><small>ஆதாரம்</small><strong>${escapeHtml(result.work || 'திருக்குறள்')} · மூலத் தரவு</strong></div>
         </div>
       </div>`;
 
-    const witnessId = `witness-panel-${++witnessWidgetCount}`;
-    body += `
+    if ((result.work || 'திருக்குறள்') === 'திருக்குறள்') {
+      const witnessId = `witness-panel-${++witnessWidgetCount}`;
+      body += `
       <div class="result-section">
         <button type="button" class="secondary-button witness-button" data-witness-number="${result.item.number}" data-witness-target="${witnessId}">
           வரலாற்றுப் பதிப்புகளுடன் ஒப்பிடு (Multi-Witness)
         </button>
         <div class="witness-report" id="${witnessId}" aria-live="polite"></div>
       </div>`;
+    } else {
+      body += `<div class="result-section"><a class="source-link" href="${escapeHtml(result.item.source || '')}" target="_blank" rel="noopener">ஆத்திச்சூடி மூலப் பதிவைப் பார் ↗</a></div>`;
+    }
 
     if (result.kind === 'altered' || result.kind === 'partial') {
       body += `
@@ -185,7 +193,7 @@ function resultMarkup(input, result, claim = {}) {
     if (claim.number && Number(claim.number) !== result.item.number) {
       body += `<div class="conflict">எண் முரண்பாடு: இந்த உரை ${result.item.number}-ஆம் குறள்; நீங்கள் ${escapeHtml(claim.number)} எனக் குறிப்பிட்டுள்ளீர்கள்.</div>`;
     }
-    if (claim.author && !/திருவள்ளுவர்/u.test(claim.author)) {
+    if (claim.author && (result.work || 'திருக்குறள்') === 'திருக்குறள்' && !/திருவள்ளுவர்/u.test(claim.author)) {
       body += `<div class="conflict">ஆசிரியர் முரண்பாடு: இந்த உரை திருவள்ளுவருடையது; நீங்கள் “${escapeHtml(claim.author)}” எனக் குறிப்பிட்டுள்ளீர்கள்.</div>`;
     }
   }
@@ -376,6 +384,108 @@ function renderPaalCards() {
   updateChapterFilter();
   renderKuralList();
 }
+
+async function loadAathichudi() {
+  try {
+    const response = await fetch(`${API}/aathichudi`);
+    if (!response.ok) throw new Error('ஆத்திச்சூடி தரவைப் பெற முடியவில்லை.');
+    aathichudi = await response.json();
+    $('libraryCount').textContent = `${aathichudi.length} ஆத்திச்சூடி வரிகள்`;
+    renderAathichudi();
+  } catch (error) {
+    $('libraryCount').textContent = 'மூலத் தரவு கிடைக்கவில்லை';
+    $('aathiList').innerHTML = emptyState('!', 'தரவை ஏற்ற முடியவில்லை', escapeHtml(error.message));
+  }
+}
+
+function renderAathichudi() {
+  const query = $('aathiSearch').value.trim().toLocaleLowerCase('ta');
+  const rows = aathichudi.filter(row => !query || String(row.number).includes(query) || row.text.toLocaleLowerCase('ta').includes(query) || row.group_name.toLocaleLowerCase('ta').includes(query));
+  $('libraryCount').textContent = `${rows.length} / ${aathichudi.length} வரிகள்`;
+  $('aathiList').innerHTML = rows.length ? rows.map(row => `<article class="literature-card"><div class="learn-meta"><strong>ஆத்திச்சூடி ${row.number}</strong><span>${escapeHtml(row.group_name)}</span></div><p class="verse-text">${escapeHtml(row.text)}</p><small>ஔவையார் · Project Madurai மூலத் தொகுப்பு</small></article>`).join('') : emptyState('?', 'வரி கிடைக்கவில்லை', 'வேறு சொல்லைத் தேடிப் பாருங்கள்.');
+}
+$('aathiSearch').addEventListener('input', renderAathichudi);
+
+function paintLearnScore() {
+  $('learnScore').textContent = `மதிப்பெண்: ${learnScore}`;
+  $('learnProgressFill').style.width = `${Math.min(100, learnScore * 10)}%`;
+  $('learnProgressText').textContent = learnScore ? `${learnScore} சரியான விடைகள் · தொடர்ந்து பயிற்சி செய்யுங்கள்.` : 'சரியான ஒவ்வொரு விடைக்கும் ஒரு மதிப்பெண்.';
+}
+function normalizeGameWord(value) {
+  return String(value || '').normalize('NFC').replace(/[\p{P}\p{S}]/gu, '').trim().replace(/\s+/gu, '');
+}
+function nextLearnRound() {
+  if (!corpus.length) return;
+  const item = corpus[Math.floor(Math.random() * corpus.length)];
+  const words = item.couplet.split(/(\s+)/u);
+  const candidates = words.map((part, index) => ({ part, index })).filter(entry => entry.part.trim() && /[\u0B80-\u0BFF]/u.test(entry.part));
+  if (!candidates.length) return;
+  const chosen = candidates[Math.floor(Math.random() * candidates.length)];
+  learnRound = { item, answer: chosen.part.replace(/[\p{P}\p{S}]/gu, ''), solved: false };
+  words[chosen.index] = '＿＿＿';
+  $('learnVerse').innerHTML = escapeHtml(words.join(''));
+  $('learnNumber').textContent = `குறள் ${item.number}`;
+  $('learnChapter').textContent = item.chapter || 'குறள் பயிற்சி';
+  $('learnClue').textContent = item.meaning || `அதிகாரம்: ${item.chapter || 'திருக்குறள்'}`;
+  $('learnAnswer').value = '';
+  $('learnAnswer').disabled = false;
+  $('checkLearn').disabled = false;
+  $('learnFeedback').textContent = '';
+  $('learnAnswer').focus();
+}
+$('nextLearn').addEventListener('click', nextLearnRound);
+$('checkLearn').addEventListener('click', () => {
+  if (!learnRound || learnRound.solved) return;
+  if (normalizeGameWord($('learnAnswer').value) === normalizeGameWord(learnRound.answer)) {
+    learnRound.solved = true;
+    learnScore += 1;
+    localStorage.setItem('meypporul-learn-score', String(learnScore));
+    $('learnVerse').textContent = learnRound.item.couplet;
+    $('learnFeedback').textContent = 'சரியான விடை! ஒரு மதிப்பெண் பெற்றீர்கள்.';
+    $('learnFeedback').className = 'learn-feedback good-text';
+    $('learnAnswer').disabled = true;
+    $('checkLearn').disabled = true;
+    paintLearnScore();
+  } else {
+    $('learnFeedback').textContent = 'இன்னும் சரியில்லை. பொருள் குறிப்பை வைத்து மீண்டும் முயற்சிக்கவும்.';
+    $('learnFeedback').className = 'learn-feedback bad-text';
+  }
+});
+$('learnAnswer').addEventListener('keydown', event => { if (event.key === 'Enter') $('checkLearn').click(); });
+$('showLearnAnswer').addEventListener('click', () => {
+  if (!learnRound) return;
+  $('learnVerse').textContent = learnRound.item.couplet;
+  $('learnFeedback').textContent = `விடை: ${learnRound.answer}. அடுத்த குறளில் மீண்டும் முயலுங்கள்.`;
+  $('learnFeedback').className = 'learn-feedback';
+  learnRound.solved = true;
+  $('learnAnswer').disabled = true;
+  $('checkLearn').disabled = true;
+});
+paintLearnScore();
+
+$('teacherCheck').addEventListener('click', async () => {
+  const quotes = $('teacherQuotes').value.split(/\r?\n/u).map(line => line.trim()).filter(Boolean);
+  if (!quotes.length) { $('teacherResults').innerHTML = `<p class="conflict">குறைந்தது ஒரு மேற்கோளையாவது உள்ளிடுங்கள்.</p>`; return; }
+  const button = $('teacherCheck'); button.disabled = true; button.textContent = 'ஆய்வு செய்கிறது…';
+  try {
+    const report = await postApi('/teacher/check', { quotes });
+    $('teacherResults').innerHTML = `<div class="teacher-summary"><strong>${report.total} பதில்கள்</strong><span>${report.verified} ஆதாரம் கிடைத்தது</span><span>${report.review} மறுபரிசீலனை தேவை</span></div>` + report.results.map(row => {
+      const [label, cls, description] = verdict(row.result.kind);
+      const source = row.result.item;
+      return `<article class="teacher-row"><span class="verdict ${cls}">${escapeHtml(label)}</span><p>${escapeHtml(row.quote)}</p><small>${source ? `${escapeHtml(row.result.work || 'திருக்குறள்')} ${source.number} · ${escapeHtml(source.chapter || '')} · ${escapeHtml(source.couplet)}` : escapeHtml(description)}</small></article>`;
+    }).join('');
+  } catch (error) { $('teacherResults').innerHTML = `<p class="conflict">${escapeHtml(error.message)}</p>`; }
+  finally { button.disabled = false; button.textContent = 'வகுப்புப் பதில்களைச் சரிபார்'; }
+});
+$('teacherClear').addEventListener('click', () => { $('teacherQuotes').value = ''; $('teacherResults').innerHTML = ''; });
+$('trySchoolApi').addEventListener('click', async () => {
+  const result = $('schoolApiResult');
+  result.textContent = 'API கோரிக்கை அனுப்பப்படுகிறது…';
+  try {
+    const data = await postApi('/public/verify', { text: 'அறம் செய விரும்பு.' });
+    result.innerHTML = `<strong>${escapeHtml(data.work || 'திருக்குறள்')} ${data.item?.number || ''}</strong> · ${escapeHtml(verdict(data.kind)[0])}<br><small>${escapeHtml(data.item?.couplet || 'இந்தத் தொகுப்பில் ஆதாரம் இல்லை')}</small>`;
+  } catch (error) { result.textContent = error.message; }
+});
 
 function updateChapterFilter() {
   const selected = $('chapterFilter').value;

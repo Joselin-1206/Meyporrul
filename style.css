@@ -546,6 +546,41 @@ main {
 .kural-card .verse-text { margin: 10px 0; }
 .kural-card .meaning-text { margin-top: 8px; }
 .kural-card-actions { display: flex; justify-content: flex-end; margin-top: 10px; }
+
+/* Learning, literature collection, and classroom tools */
+.learn-layout { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(250px, .8fr); gap: 18px; }
+.learn-card, .learn-side, .teacher-panel, .school-integration { padding: 22px; }
+.learn-meta { display: flex; align-items: center; justify-content: space-between; gap: 12px; color: var(--muted); font-size: 13px; }
+.learn-verse { min-height: 90px; padding: 18px; margin: 18px 0 10px; border-radius: 12px; background: var(--card-subtle); font: 700 24px/1.8 'Noto Serif Tamil', serif; white-space: pre-line; }
+.learn-clue { min-height: 48px; color: var(--muted); }
+.learn-answer-row { display: flex; gap: 10px; margin-top: 8px; }
+.learn-answer-row input { min-width: 0; flex: 1; }
+.learn-feedback { min-height: 28px; margin: 12px 0; font-weight: 700; }
+.good-text { color: var(--green); }
+.bad-text { color: var(--red); }
+.learn-side h3, .school-integration h3 { margin-top: 0; font: 700 20px 'Noto Serif Tamil', serif; }
+.learn-side p, .school-integration p { color: var(--muted); }
+.learn-progress { height: 10px; overflow: hidden; margin: 20px 0 8px; border-radius: 999px; background: var(--line); }
+.learn-progress span { display: block; width: 0; height: 100%; border-radius: inherit; background: var(--green); transition: width .25s ease; }
+.library-tools { display: flex; align-items: center; gap: 12px; padding: 16px; margin-bottom: 16px; }
+.library-tools label { font-weight: 700; white-space: nowrap; }
+.library-tools input { flex: 1; min-width: 120px; }
+.literature-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.literature-card { padding: 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--card); box-shadow: var(--shadow); }
+.literature-card .verse-text { margin: 14px 0 8px; font: 600 18px/1.7 'Noto Serif Tamil', serif; }
+.literature-card > small, .source-caption { color: var(--muted); font-size: 12px; }
+.source-caption { margin-top: 18px; }
+.section-lead { color: var(--muted); margin: -8px 0 16px; }
+.teacher-panel { margin-bottom: 18px; }
+.teacher-panel textarea { width: 100%; margin-top: 8px; }
+.teacher-summary { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 16px; padding: 13px; border-radius: 10px; background: var(--softgreen); }
+.teacher-row { padding: 14px 4px; border-bottom: 1px solid var(--line); }
+.teacher-row p { margin: 8px 0; }
+.teacher-row small { color: var(--muted); line-height: 1.7; }
+.school-integration { display: flex; align-items: flex-start; flex-direction: column; }
+.integration-points { display: flex; flex-wrap: wrap; gap: 10px 20px; margin: 2px 0 16px; color: var(--green); font-size: 13px; font-weight: 700; }
+.api-result { min-height: 24px; margin-top: 12px; }
+.api-result small { color: var(--muted); }
 .browse-more { display: block; margin: 16px auto 0; }
 
 /* Result Details */
@@ -696,6 +731,9 @@ main {
 .api-panel {
   padding: 30px;
 }
+.api-endpoints { display: grid; grid-template-columns: auto auto; justify-content: start; align-items: center; gap: 10px 18px; padding: 16px; margin: 14px 0 22px; border: 1px solid var(--line); border-radius: 12px; background: var(--card-subtle); }
+.api-endpoints code { padding: 5px 8px; border-radius: 6px; background: var(--softgreen); color: var(--green); font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+.api-endpoints small { grid-column: 1 / -1; color: var(--muted); }
 .api-lead {
   font-size: 15px;
   color: var(--ink);
@@ -781,8 +819,10 @@ footer {
   .tabs { overflow-x: auto; }
   .tab { white-space: nowrap; }
   .paal-cards { grid-template-columns: 1fr; }
-  .browse-controls { grid-template-columns: 1fr; }
+  .learn-layout { grid-template-columns: 1fr; }
+  .literature-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .roadmap-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .browse-controls { grid-template-columns: 1fr; }
   .topbar { padding-inline: 14px; }
   .user-label { display: none; }
 }
@@ -792,4 +832,7 @@ footer {
   .roadmap-heading { align-items: flex-start; flex-direction: column; }
   .roadmap-grid { grid-template-columns: 1fr; }
   .roadmap-card { min-height: 0; }
+  .literature-grid { grid-template-columns: 1fr; }
+  .library-tools { align-items: stretch; flex-direction: column; }
+  .learn-answer-row { flex-direction: column; }
 }
